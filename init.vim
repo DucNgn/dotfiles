@@ -2,8 +2,11 @@
 "| '_ \ / _ \/ _ \ \ / / | '_ ` _ \
 "| | | |  __/ (_) \ V /| | | | | | |
 "|_| |_|\___|\___/ \_/ |_|_| |_| |_|
+"
 
+set shell=/usr/local/bin/fish 
 let mapleader = ","
+set updatetime=300
 
 call plug#begin()
 " EASYMOTION VIM: quick navigate motions
@@ -27,33 +30,24 @@ Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install'  }
 " Waka time stats:
 Plug 'wakatime/vim-wakatime'
 
-" CodiVim: Add a side panel for Python real-time result:
-Plug 'metakirby5/codi.vim'
-
-" Activate Fuzzy finder
-Plug '/usr/local/optfzf'
+" Fuzzy finder
+Plug '/usr/local/opt/fzf'
 Plug 'junegunn/fzf.vim'
 
-" Vim Indent display
-Plug 'nathanaelkane/vim-indent-guides'
+" YouCompleeMe: Code completion engine
+Plug 'ycm-core/YouCompleteMe'
 
-" COC
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
+" Deoplete: Auto completion
+Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' } 
 
-"vim-vista
-Plug 'liuchengxu/vista.vim'
+" Use Tab for auto completion
+Plug 'ervandew/supertab'
 
-" Rust-language support
-Plug 'rust-lang/rust.vim'
+" Vim-wiki for note-taking
+Plug 'vimwiki/vimwiki'
 
 " Vim-syntastic
 Plug 'vim-syntastic/syntastic'
-
-" Dependencies for snip-mate:
-Plug 'MarcWeber/vim-addon-mw-utils'
-Plug 'tomtom/tlib_vim'
-Plug 'honza/vim-snippets'
-Plug 'garbas/vim-snipmate'
 
 " Split Term
 Plug 'vimlab/split-term.vim'
@@ -61,9 +55,8 @@ Plug 'vimlab/split-term.vim'
 "Floating terminal
 Plug 'voldikss/vim-floaterm'
 
-" Vim-airline
-Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
+" Vim-gitgutter: Display Git changes in file
+Plug 'airblade/vim-gitgutter'
 
 " Night Sense
 Plug 'nightsense/night-and-day'
@@ -73,19 +66,16 @@ Plug 'xolox/vim-colorscheme-switcher'
 
 " Vim color schemes
 Plug 'rafi/awesome-vim-colorschemes'
-Plug 'arcticicestudio/nord-vim'
 
 " NERD TREE:
 Plug 'scrooloose/nerdtree'
 Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
-" Plug 'Xuyuanp/nerdtree-git-plugin'
 
 " Vim Devicons
 Plug 'ryanoasis/vim-devicons'
 
 " Vim Smoothie
 Plug 'psliwka/vim-smoothie'
-
 
 call plug#end()
 
@@ -113,58 +103,12 @@ let g:livepreview_previewer = 'open -a Preview'
 nmap <F12> :LLPStartPreview<cr>
 
 " INSTANT .MD----
-nmap <leader>o <Plug>MarkdownPreviewToggle
+nmap <C-p> <Plug>MarkdownPreviewToggle
 let g:mkdp_port = '7070'
 
-" CodiVim:--------------
-nmap <F5> :Codi!!<CR>
-
-" Vim indent display-------------------
-let g:indent_guides_enable_on_vim_startup = 1
-
-" COC-Auto Complete -------------------
-set cmdheight=2
-set updatetime=300
-set signcolumn=yes
-" Highlight symbol under cursor
-autocmd CursorHold * silent call CocActionAsync('highlight')
-
-" use <TAB> to trigger completion, and navigate
-inoremap <silent><expr> <TAB>
-      \ pumvisible() ? "\<C-n>" :
-      \ <SID>check_back_space() ? "\<TAB>" :
-      \ coc#refresh()
-inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
-
-function! s:check_back_space() abort
-  let col = col('.') - 1
-  return !col || getline('.')[col - 1]  =~# '\s'
-endfunction
-" check <tab> mapping by ':verbose imap <tab>'
-
-" Trigger completion if missed
-inoremap <silent><expr> <c-space> coc#refresh()
-
-" key-binding to definition
-nmap <silent> gd <Plug>(coc-definition)
-nmap <silent> gy <Plug>(coc-type-definition)
-nmap <silent> gi <Plug>(coc-implementation)
-nmap <silent> gr <Plug>(coc-references)
-
-" Vim-Vista-------------
-" Go to nearest method or function
-function! NearestMethodOrFunction() abort
-  return get(b:, 'vista_nearest_method_or_function', '')
-endfunction
-nmap <leader>a :Vista!!<CR>
-imap <C-A> :Vista!!<CR> 
-let g:vista#renderer#enable_icon = 1
-let g:vista_executive_for = {
-	\'java': 'coc',
-	\'javascript': 'coc',
-	\'python': 'coc',
-	\'latex': 'coc',
-	\ }
+" Deoplete
+" Use deoplete.
+let g:deoplete#enable_at_startup = 1
 
 " Syntastic-------------
 let g:syntastic_enable_balloons = 1
@@ -175,11 +119,6 @@ let g:syntastic_check_on_wq = 0
 
 let g:syntastic_quiet_messages = {"regex": "36"}
 
-" Snip-mate:
-:imap ss <esc><Plug>snipMateNextOrTrigger
-:smap ss <Plug>snipMateNextOrTrigger
-:nmap <leader>0 :SnipMateOpenSnippetFiles<CR>
-
 " Split Terminal --------
 let g:split_term_default_shell = "fish"
 nmap <Leader>1 :Term<CR>
@@ -187,26 +126,19 @@ nmap <Leader>2 :VTerm<CR>
 nmap <Leader>3 :Term
 
 " Floating Terminal -----
-let g:floaterm_winblend = 20 
-noremap  <silent> <F2>           :FloatermToggle<CR>i
-noremap! <silent> <F2>           <Esc>:FloatermToggle<CR>i
-tnoremap <silent> <F2>           <C-\><C-n>:FloatermToggle<CR>
-
-" Vim-Airline------------
-let g:airline_powerline_fonts = 1
-let g:airline#extensions#tabline#enabled = 1
-let g:airline#extensions#tabline#formatter = 'unique_tail'
+let g:floaterm_winblend = 10
+let g:floaterm_position = 'center'
+let g:floaterm_keymap_toggle = '<leader>4'
 
 " NightSense ------------
-let g:nd_airline = 1
 let g:nd_themes = [
-   \ ['9:00',  'challenger_deep', 'dark', 'base16' ], 
-   \ ['12:00', 'rakr', 'light', 'base16'],
-   \ ['18:00', 'OceanicNext', 'dark', 'bubblegum'  ],
-   \ ['22:00', 'gotham256', 'dark', 'monochrome']]
+   \ ['9:00',  'lucius', 'dark'], 
+   \ ['12:00', 'rakr', 'dark'],
+   \ ['18:00', 'OceanicNext', 'dark'],
+   \ ['22:00', 'gotham256', 'dark']]
 
 " NERD TREE -------------
-map <F4> :NERDTreeToggle<CR>
+map <C-n> :NERDTreeToggle<CR>
 " Close nerd tree is it is the last opening window.
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 
@@ -214,9 +146,6 @@ autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isT
 let g:NERDTreeFileExtensionHighlightFullName = 1
 let g:NERDTreeExactMatchHighlightFullName = 1
 let g:NERDTreePatternMatchHighlightFullName = 1
-
-" NERD GIT TAG-----------
-set shell=sh "to work with fish shell"
 
 " Devicons --------------
 let g:webdevicons_conceal_nerdtree_brackets = 0
@@ -250,7 +179,6 @@ noremap <C-S> :update<CR>
 vnoremap <C-S> <C-C>:update<CR>
 inoremap <C-S> <C-O>:update<CR>
 
-
 " Quick Quit Command:
 noremap <Leader>e :quit<CR>
 
@@ -277,5 +205,5 @@ vnoremap > >g
 " Copy to system's clipboard
 vnoremap <C-c> "*y
 
-" Escape mode faster
+" Escaping insert mode faster
 :imap ii <Esc>
