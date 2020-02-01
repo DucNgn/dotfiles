@@ -3,12 +3,17 @@
 "| | | |  __/ (_) \ V /| | | | | | |
 "|_| |_|\___|\___/ \_/ |_|_| |_| |_|
 "
-
 set shell=/usr/local/bin/fish 
 let mapleader = ","
-set updatetime=300
+set updatetime=400
 
 call plug#begin()
+" Vim align easy
+Plug 'junegunn/vim-easy-align'
+
+" Vim indent line
+Plug 'Yggdroot/indentLine'
+
 " EASYMOTION VIM: quick navigate motions
 Plug 'easymotion/vim-easymotion'
 
@@ -28,13 +33,13 @@ Plug 'xuhdev/vim-latex-live-preview', { 'for': 'tex' }
 Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install'  }
 
 " Waka time stats:
-Plug 'wakatime/vim-wakatime'
+Plug 'wakatim/vim-wakatime'
 
 " Fuzzy finder
 Plug '/usr/local/opt/fzf'
 Plug 'junegunn/fzf.vim'
 
-" YouCompleeMe: Code completion engine
+" YouCompleteMe: Code completion engine
 Plug 'ycm-core/YouCompleteMe'
 
 " Deoplete: Auto completion
@@ -67,6 +72,12 @@ Plug 'xolox/vim-colorscheme-switcher'
 " Vim color schemes
 Plug 'rafi/awesome-vim-colorschemes'
 
+" Vim Lightline
+Plug 'itchyny/lightline.vim'
+
+" Git branch name displat
+Plug 'itchyny/vim-gitbranch'
+
 " NERD TREE:
 Plug 'scrooloose/nerdtree'
 Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
@@ -80,6 +91,13 @@ Plug 'psliwka/vim-smoothie'
 call plug#end()
 
 "---CONFIG ----
+" Vim easy align
+" Start interactive EasyAlign in visual mode (e.g. vipga)
+xmap ga <Plug>(EasyAlign)
+
+" Start interactive EasyAlign for a motion/text object (e.g. gaip)
+nmap ga <Plug>(EasyAlign)
+
 "EASYMOTION VIM---
 "move to line
 map <Leader>l <Plug>(easymotion-bd-jk)
@@ -133,9 +151,22 @@ let g:floaterm_keymap_toggle = '<leader>4'
 " NightSense ------------
 let g:nd_themes = [
    \ ['9:00',  'lucius', 'dark'], 
-   \ ['12:00', 'rakr', 'dark'],
+   \ ['12:00', 'gruvbox','dark'], 
    \ ['18:00', 'OceanicNext', 'dark'],
    \ ['22:00', 'gotham256', 'dark']]
+
+" Vim Lightline ---------
+set noshowmode  " No insert display mode "
+let g:lightline = {
+      \ 'colorscheme': 'seoul256',
+      \ 'active': {
+      \   'left': [ [ 'mode', 'paste' ],
+      \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ]
+      \ },
+      \ 'component_function': {
+      \   'gitbranch': 'gitbranch#name'
+      \ },
+      \ }
 
 " NERD TREE -------------
 map <C-n> :NERDTreeToggle<CR>
@@ -206,4 +237,27 @@ vnoremap > >g
 vnoremap <C-c> "*y
 
 " Escaping insert mode faster
-:imap ii <Esc>
+:imap <C-]> <Esc>
+
+" Run Java program without quitting vim
+" F9/F10 compile/run default file.
+" F11/F12 compile/run alternate file. <if driver is in the other file>
+map <F9> :set makeprg=javac\ %<CR>:make<CR>
+map <F10> :!echo %\|awk -F. '{print $1}'\|xargs java<CR>
+map <F11> :set makeprg=javac\ #<CR>:make<CR>
+map <F12> :!echo #\|awk -F. '{print $1}'\|xargs java<CR>
+
+map! <F9> <Esc>:set makeprg=javac\ %<CR>:make<CR>
+map! <F10> <Esc>:!echo %\|awk -F. '{print $1}'\|xargs java<CR>
+map! <F11> <Esc>set makeprg=javac\ #<CR>:make<CR>
+map! <F12> <Esc>!echo #\|awk -F. '{print $1}'\|xargs java<CR>
+
+set makeprg=javac\ %
+set errorformat=%A:%f:%l:\ %m,%-Z%p^,%-C%.%#
+
+" If two files are loaded, switch to the alternate file, then back.
+if argc() == 2
+  n
+  e #
+endif
+"-------------------------"
