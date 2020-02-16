@@ -5,9 +5,12 @@
 "
 set shell=/usr/local/bin/fish 
 let mapleader = ","
-set updatetime=400
+set updatetime=100
 
 call plug#begin()
+" vim-startify: fancy start screen 
+Plug 'mhinz/vim-startify'
+
 " Vim align easy
 Plug 'junegunn/vim-easy-align'
 
@@ -30,10 +33,10 @@ Plug 'lervag/vimtex'
 Plug 'xuhdev/vim-latex-live-preview', { 'for': 'tex' }
 
 " Markdown Preview 
-Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install'  }
+Plug 'iamcco/markdown-preview.nvim', { 'do: 'cd app & yarn install'  }
 
-" Waka time stats:
-Plug 'wakatim/vim-wakatime'
+" Waka time
+Plug 'wakatime/vim-wakatime'
 
 " Fuzzy finder
 Plug '/usr/local/opt/fzf'
@@ -91,6 +94,15 @@ Plug 'psliwka/vim-smoothie'
 call plug#end()
 
 "---CONFIG ----
+" Vim startify
+" NERDTree and Startify start up at the same time
+autocmd VimEnter *
+                \   if !argc()
+                \ |   Startify
+                \ |   NERDTree
+                \ |   wincmd w
+                \ | endif
+
 " Vim easy align
 " Start interactive EasyAlign in visual mode (e.g. vipga)
 xmap ga <Plug>(EasyAlign)
@@ -121,8 +133,8 @@ let g:livepreview_previewer = 'open -a Preview'
 nmap <F12> :LLPStartPreview<cr>
 
 " INSTANT .MD----
-nmap <C-p> <Plug>MarkdownPreviewToggle
-let g:mkdp_port = '7070'
+"nmap <C-p> <Plug>MarkdownPreviewToggle
+"let g:mkdp_port = '7070'
 
 " Deoplete
 " Use deoplete.
@@ -191,6 +203,9 @@ set noswapfile
 set nobackup
 set nowritebackup
 
+" Auto reload
+set autoread
+
 " hybrid line number:
 :set number relativenumber
 :set nu rnu
@@ -237,7 +252,8 @@ vnoremap > >g
 vnoremap <C-c> "*y
 
 " Escaping insert mode faster
-:imap <C-]> <Esc>
+inoremap jk <esc>
+inoremap kj <esc>
 
 " Run Java program without quitting vim
 " F9/F10 compile/run default file.
@@ -261,3 +277,4 @@ if argc() == 2
   e #
 endif
 "-------------------------"
+'
