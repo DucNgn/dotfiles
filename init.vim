@@ -1,111 +1,81 @@
-" _ __   ___  _____   _(_) __ ___
+" _ __   ___  _____   _(_)_ __ ___
 "| '_ \ / _ \/ _ \ \ / / | '_ ` _ \
 "| | | |  __/ (_) \ V /| | | | | | |
 "|_| |_|\___|\___/ \_/ |_|_| |_| |_|
 "
 set shell=/usr/local/bin/fish 
 let mapleader = ","
-set updatetime=100
+set updatetime=200
 
 call plug#begin()
-" vim-startify: fancy start screen 
-Plug 'mhinz/vim-startify'
+" THEMES, APPEARANCE --------------
+Plug 'ryanoasis/vim-devicons'
 
-" Vim-expand-region
-Plug 'terryma/vim-expand-region'
+Plug 'psliwka/vim-smoothie'
 
-" Vim align easy
-Plug 'junegunn/vim-easy-align'
+Plug 'itchyny/lightline.vim'
 
-" Vim indent line
-Plug 'Yggdroot/indentLine'
-
-" EASYMOTION VIM: quick navigate motions
+" MOVEMENT ------------------------
 Plug 'easymotion/vim-easymotion'
 
-" GOYO: Distraction-free writing
-Plug 'junegunn/goyo.vim'
-
-" VimTex: For LaTex file
-Plug 'lervag/vimtex'
-
-" Vim-latex-Preview: 
-Plug 'xuhdev/vim-latex-live-preview', { 'for': 'tex' }
-
-" Markdown preview
-Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install'  }
-
-" Waka time
-Plug 'wakatime/vim-wakatime'
-
-" Fuzzy finder
 Plug '/usr/local/opt/fzf'
 Plug 'junegunn/fzf.vim'
 
-" MRU: Most recent use file
-Plug 'yegappan/mru'
+Plug 'majutsushi/tagbar'
 
-" UltiSnip to trigger snippets
-Plug 'SirVer/ultisnips'
-
-" Snippet library
-Plug 'honza/vim-snippets'
-
-" YouCompleteMe: Code completion engine
-Plug 'ycm-core/YouCompleteMe'
-
-" Deoplete: Auto completion
-Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' } 
-
-" Use Tab for auto completion
-Plug 'ervandew/supertab'
-
-" Vim-wiki for note-taking
-Plug 'vimwiki/vimwiki'
-
-" Vim-syntastic
-Plug 'vim-syntastic/syntastic'
-
-" Split Term
-Plug 'vimlab/split-term.vim'
-
-"Floating terminal
-Plug 'voldikss/vim-floaterm'
-
-" Vim-fugitive for git
-Plug 'tpope/vim-fugitive'
-
-" Night Sense
-Plug 'nightsense/night-and-day'
-
-" Vim color scheme switcher
-Plug 'xolox/vim-colorscheme-switcher'
-
-" Vim color schemes
-Plug 'rafi/awesome-vim-colorschemes'
-
-" Candid color scheme
-Plug 'flrnd/candid.vim'
-
-" Vim Lightline
-Plug 'itchyny/lightline.vim'
-
-" Git branch name displat
-Plug 'itchyny/vim-gitbranch'
-
-" NERD TREE:
 Plug 'scrooloose/nerdtree'
 Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
 
-" Vim Devicons
-Plug 'ryanoasis/vim-devicons'
+" SNIPPETS, CODE COMPLETE----------
 
-" Vim Smoothie
-Plug 'psliwka/vim-smoothie'
+Plug 'SirVer/ultisnips'
+
+Plug 'honza/vim-snippets'
+
+Plug 'ycm-core/YouCompleteMe'
+
+Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugin' } 
+
+Plug 'ervandew/supertab'
+
+Plug 'vim-syntastic/syntastic'
+
+" FORMATTING-----------------------
+Plug 'terryma/vim-expand-region'
+
+Plug 'junegunn/vim-easy-align'
+
+Plug 'Yggdroot/indentLine'
+
+Plug 'jiangmiao/auto-pairs'
+
+" WRITING--------------------------
+
+Plug 'junegunn/goyo.vim'
+
+Plug 'lervag/vimtex'
+
+Plug 'xuhdev/vim-latex-live-preview', { 'for': 'tex' }
+
+Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install'  }
+
+Plug 'vimwiki/vimwiki'
+
+" MISC ----------------------------
+Plug 'wakatime/vim-wakatime'
+
+Plug 'vimlab/split-term.vim'
+
+Plug 'voldikss/vim-floaterm'
+
+Plug 'airblade/vim-gitgutter'
+
+Plug 'itchyny/vim-gitbranch'
 
 call plug#end()
 
-"---CONFIG ----
+"---CONFIG----
+
 " Vim easy align-----------------------------------------------
 " Start interactive EasyAlign in visual mode (e.g. vipga)
 xmap ga <Plug>(EasyAlign)
@@ -129,146 +99,147 @@ nmap <Leader>l <Plug>(easymotion-overwin-line)
 map <Leader>w <Plug>(easymotion-bd-w)
 nmap <Leader>w <Plug>(easymotion-overwin-w)
 
-" MRU Most recent use files-------------------------------------
-map <leader>re :MRU<CR>
-
 " GOYO ---------------------------------------------------------
 noremap <leader>g :Goyo <CR>
 
 " fzf fuzzy file searching -------------------------------------
-nmap <leader>f :Files <CR>
+nmap <C-g> :Files <CR>
 nmap <leader>a :Ag <CR>
 nmap <leader>snip :Snippets <CR>
 
-" File preview with Bat
+" File preview with Bat when using fzf 
 command! -bang -nargs=? -complete=dir Files
     \ call fzf#vim#files(<q-args>, fzf#vim#with_preview(), <bang>0)
 
-" VIMTEX -------------------------------------------------------
+" VIMTEX 
 let g:tex_flavor='latex'
 let g:vimtex_quickfix_mode=0
 let g:tex_conceal='abdmg'
 
-" LaTex Preview-------------------------------------------------
+" LaTex Preview
 autocmd Filetype tex setl updatetime=1
 let g:livepreview_previewer = 'open -a Preview'
 nmap <F12> :LLPStartPreview<cr>
 
-" Markdown preview ---------------------------------------------
+" Markdown preview 
 nmap <C-p> <Plug>MarkdownPreview
 
-" Deoplete -----------------------------------------------------
+" Deoplete
 let g:deoplete#enable_at_startup = 1
 
-" Syntastic-----------------------------------------------------
+" Syntastic
 let g:syntastic_enable_balloons = 1
 let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_auto_loc_list = 1
 let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
 
-" Split Terminal ------------------------------------------------
+" Split Terminal 
 let g:split_term_default_shell = "fish"
-nmap <Leader>1 :Term<CR>
-nmap <Leader>2 :VTerm<CR>
+nmap <F2> :Term<CR>
+nmap <F3> :VTerm<CR>
 
-" Floating Terminal ---------------------------------------------
+" Floating Terminal 
 let g:floaterm_winblend = 10
 let g:floaterm_position = 'center'
-let g:floaterm_keymap_toggle = '<leader>4'
+let g:floaterm_keymap_toggle = '<F4>'
 
-" NightSense ----------------------------------------------------
-let g:nd_themes = [
-   \ ['9:00',  'lucius', 'dark'], 
-   \ ['12:00', 'hybrid', 'dark'], 
-   \ ['18:00', 'OceanicNext', 'dark'],
-   \ ['22:00', 'gotham256', 'dark']]
-" Suggested colorscheme: lucius-dark, gotham256-dark 
-
-" Vim Lightline --------------------------------------------------
+" Vim Lightline 
 set noshowmode  " No insert display mode "
-" Suggested color: seoul256
+
+function! FileNameWithIcon() abort
+  return winwidth(0) > 70  ?  WebDevIconsGetFileTypeSymbol() . ' ' . expand('%:t') : '' 
+endfunction
+
 let g:lightline = {
-      \ 'colorscheme': 'candid',
+      \ 'colorscheme': 'seoul256',
       \ 'active': {
       \   'left': [ [ 'mode', 'paste' ],
-      \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ]
+      \             [ 'gitbranch', 'readonly', 'filename_with_icon', 'modified' ] ],
+      \   'right': [['lineinfo', 'percent']]
       \ },
       \ 'component_function': {
-      \   'gitbranch': 'gitbranch#name'
+      \   'gitbranch': 'gitbranch#name',
+      \   'filename_with_icon': 'FileNameWithIcon'	
       \ },
       \ }
 
-" UltiSnip --------------------------------------------------------
+" UltiSnip 
 let g:UltiSnipsExpandTrigger="qq"
 
-" YouCompleteMe ---------------------------------------------------
+" YouCompleteMe 
 let g:ycm_global_ycm_extra_conf = '~/.config/nvim/configuration/.ycm_extra_conf.py'
 
-" NERD TREE -------------------------------------------------------
+" NERD TREE 
 map <C-n> :NERDTreeToggle<CR>
-" Close nerd tree is it is the last opening window.
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 
-" NERD TREE HIGHLIGHT----------------------------------------------
+" NERD TREE HIGHLIGHT
 let g:NERDTreeFileExtensionHighlightFullName = 1
 let g:NERDTreeExactMatchHighlightFullName = 1
 let g:NERDTreePatternMatchHighlightFullName = 1
 
-" Devicons ---------------------------------------------------------
+" Devicons 
 let g:webdevicons_conceal_nerdtree_brackets = 0
+
+" Tagbar 
+nmap <leader>t :TagbarToggle<CR>
 
 "----------------------General Configuration -----------------
 " word wrapping
 set wrap linebreak nolist
 
+" Breakindent
+set breakindent
+set breakindent showbreak=..
+
 " case-insensitive when searching in file
 set ignorecase
+set smartcase
 
 " No backup file
 set noswapfile
 set nobackup
 set nowritebackup
 
-" Auto reload
 set autoread
 
-" hybrid line number:
-:set number relativenumber
-:set nu rnu
+" hybrid line number
+set number relativenumber
+set nu rnu
 
-" Spell Checker:
+" Spell Checker
 nmap <F6> :set spell spelllang=en_ca <CR>
 inoremap <C-l> <c-g>u<Esc>[s1z=`]a<c-g>u
 
-" Enable mouse:
+" Enable mouse
 set mouse=a
 
-"True colours:
-:set termguicolors
+"True colours
+set termguicolors
 
-" Quick Saving: Ctrl + S
+" Quick Saving
 noremap <C-S> :update<CR>
 vnoremap <C-S> <C-C>:update<CR>
 inoremap <C-S> <C-O>:update<CR>
 
-" Quick Quit Command:
+" Quick Quit Command
 noremap <Leader>e :quit<CR>
 
-" Disable Arrow Key: 
+" Disable Arrow Key
 noremap <Up> <Nop>
 noremap <Down> <Nop>
 noremap <Left> <Nop>
 noremap <Right> <Nop>
 
-" Binding For Tab Navigation:
+" Binding For Tab Navigation
 map <C-t> :tabnew<CR>
 map <C-d> :tab split<CR>
 map <C-x> :tabc<CR>
 map <C-S-l> :tabn<CR>
 map <C-S-h> :tabp<CR>
 
-" Moving Code Blocks:
+" Moving Code Blocks
 vnoremap < <gv 
 vnoremap > >g
 
