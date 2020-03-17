@@ -4,20 +4,18 @@
 "|_| |_|\___|\___/ \_/ |_|_| |_| |_|
 "
 set shell=/usr/local/bin/fish 
-let mapleader = ","
+let mapleader = " "
 set updatetime=200
 
 call plug#begin()
 " THEMES, APPEARANCE --------------
 Plug 'ryanoasis/vim-devicons'
 
-Plug 'psliwka/vim-smoothie'
-
 Plug 'itchyny/lightline.vim'
 
-" MOVEMENT ------------------------
-Plug 'easymotion/vim-easymotion'
+Plug 'psliwka/vim-smoothie'
 
+" MOVEMENT ------------------------
 Plug '/usr/local/opt/fzf'
 Plug 'junegunn/fzf.vim'
 
@@ -34,11 +32,16 @@ Plug 'honza/vim-snippets'
 
 Plug 'ycm-core/YouCompleteMe'
 
-Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugin' } 
+" Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' } 
 
-Plug 'ervandew/supertab'
+Plug 'vim-syntastic/syntatic'
 
-Plug 'vim-syntastic/syntastic'
+" LANGUAGE SUPPORT ----------------
+Plug 'rust-lang/rust.vim'
+
+Plug 'lervag/vimtex'
+
+Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install'  }
 
 " FORMATTING-----------------------
 Plug 'terryma/vim-expand-region'
@@ -53,22 +56,8 @@ Plug 'jiangmiao/auto-pairs'
 
 Plug 'junegunn/goyo.vim'
 
-Plug 'lervag/vimtex'
-
-Plug 'xuhdev/vim-latex-live-preview', { 'for': 'tex' }
-
-Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install'  }
-
-Plug 'vimwiki/vimwiki'
-
 " MISC ----------------------------
 Plug 'wakatime/vim-wakatime'
-
-Plug 'vimlab/split-term.vim'
-
-Plug 'voldikss/vim-floaterm'
-
-Plug 'airblade/vim-gitgutter'
 
 Plug 'itchyny/vim-gitbranch'
 
@@ -91,21 +80,13 @@ map J <Plug>(expand_region_shrink)
 " Prevent hiding characters in md, json
 let g:indentLine_setConceal = 0 
 
-"EASYMOTION VIM------------------------------------------------
-"move to line
-map <Leader>l <Plug>(easymotion-bd-jk)
-nmap <Leader>l <Plug>(easymotion-overwin-line)
-"move to word
-map <Leader>w <Plug>(easymotion-bd-w)
-nmap <Leader>w <Plug>(easymotion-overwin-w)
-
 " GOYO ---------------------------------------------------------
 noremap <leader>g :Goyo <CR>
 
 " fzf fuzzy file searching -------------------------------------
-nmap <C-g> :Files <CR>
-nmap <leader>a :Ag <CR>
-nmap <leader>snip :Snippets <CR>
+nmap <leader>ff :Files <CR>
+nmap <leader>fc :Ag <CR>
+nmap <leader>fs :Snippets <CR>
 
 " File preview with Bat when using fzf 
 command! -bang -nargs=? -complete=dir Files
@@ -115,11 +96,11 @@ command! -bang -nargs=? -complete=dir Files
 let g:tex_flavor='latex'
 let g:vimtex_quickfix_mode=0
 let g:tex_conceal='abdmg'
+set conceallevel=1
 
-" LaTex Preview
-autocmd Filetype tex setl updatetime=1
-let g:livepreview_previewer = 'open -a Preview'
-nmap <F12> :LLPStartPreview<cr>
+" Compile latex file using xelatex and open preview with Skim
+autocmd FileType tex nmap <buffer> <leader>lc :!xelatex %<CR>
+autocmd FileType tex nmap <buffer> Ls :!open -a Skim %:r.pdf<CR><CR>
 
 " Markdown preview 
 nmap <C-p> <Plug>MarkdownPreview
@@ -131,18 +112,14 @@ let g:deoplete#enable_at_startup = 1
 let g:syntastic_enable_balloons = 1
 let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_auto_loc_list = 1
-let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_open = 0
 let g:syntastic_check_on_wq = 0
-
-" Split Terminal 
-let g:split_term_default_shell = "fish"
-nmap <F2> :Term<CR>
-nmap <F3> :VTerm<CR>
-
-" Floating Terminal 
-let g:floaterm_winblend = 10
-let g:floaterm_position = 'center'
-let g:floaterm_keymap_toggle = '<F4>'
+" Let the size of error notice adjusts with content size
+function! SyntasticCheckHook(errors)
+    if !empty(a:errors)
+        let g:syntastic_loc_list_height = min([len(a:errors), 10])
+    endif
+endfunction
 
 " Vim Lightline 
 set noshowmode  " No insert display mode "
@@ -170,8 +147,11 @@ let g:UltiSnipsExpandTrigger="qq"
 " YouCompleteMe 
 let g:ycm_global_ycm_extra_conf = '~/.config/nvim/configuration/.ycm_extra_conf.py'
 
+" rustfmt
+let g:rustfmt_autosave = 1
+
 " NERD TREE 
-map <C-n> :NERDTreeToggle<CR>
+map <leader>fn :NERDTreeToggle<CR>
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 
 " NERD TREE HIGHLIGHT
@@ -183,11 +163,15 @@ let g:NERDTreePatternMatchHighlightFullName = 1
 let g:webdevicons_conceal_nerdtree_brackets = 0
 
 " Tagbar 
-nmap <leader>t :TagbarToggle<CR>
+nmap <leader>tt :TagbarToggle<CR>
 
 "----------------------General Configuration -----------------
 " word wrapping
 set wrap linebreak nolist
+
+set tabstop=2
+set shiftwidth=4
+set expandtab
 
 " Breakindent
 set breakindent
@@ -201,7 +185,6 @@ set smartcase
 set noswapfile
 set nobackup
 set nowritebackup
-
 set autoread
 
 " hybrid line number
@@ -216,7 +199,8 @@ inoremap <C-l> <c-g>u<Esc>[s1z=`]a<c-g>u
 set mouse=a
 
 "True colours
-set termguicolors
+set background=dark
+"set termguicolors
 
 " Quick Saving
 noremap <C-S> :update<CR>
@@ -224,7 +208,7 @@ vnoremap <C-S> <C-C>:update<CR>
 inoremap <C-S> <C-O>:update<CR>
 
 " Quick Quit Command
-noremap <Leader>e :quit<CR>
+noremap <leader>e :quit<CR>
 
 " Disable Arrow Key
 noremap <Up> <Nop>
@@ -233,11 +217,41 @@ noremap <Left> <Nop>
 noremap <Right> <Nop>
 
 " Binding For Tab Navigation
-map <C-t> :tabnew<CR>
-map <C-d> :tab split<CR>
-map <C-x> :tabc<CR>
-map <C-S-l> :tabn<CR>
-map <C-S-h> :tabp<CR>
+map <leader>tl :tabs<CR>
+map <leader>tc :tabnew<CR>
+map <leader>tx :tabc<CR>
+map <leader>tn :tabn<CR>
+map <leader>tp :tabp<CR>
+map <leader>tm :tabm
+
+imap ,tl <Esc>:tabs<CR>
+imap ,tc <Esc>:tabnew<CR>
+imap ,tn <ESC>:tabn<CR>
+imap ,tp <ESC>:tabp<CR>
+
+" Binding for window buffer
+map <leader>wl :ls<CR>
+map <leader>wd :bd<CR>
+map <leader>ws :new<CR>
+map <leader>wv :vne<CR>
+map <leader>wz <C-w>z
+
+" terminal mode
+map <F2> :term<CR>
+map <F3> :new \| :terminal<CR>
+map <F4> :vne \| :terminal<CR>
+tnoremap <Esc> <C-\><C-n>
+
+" make
+map <leader>ms :mksession 
+
+" Binding for buffer navigation:
+map <leader>bp :bprev<CR>
+map <leader>bn :bnext<CR>
+nnoremap <leader>wh <C-w>h
+nnoremap <leader>wj <C-w>j
+nnoremap <leader>wk <C-w>k
+nnoremap <leader>wl <C-w>l
 
 " Moving Code Blocks
 vnoremap < <gv 
@@ -250,11 +264,6 @@ vnoremap <C-c> "*y
 inoremap jk <esc>
 inoremap kj <esc>
 
-" Map <Space> to / (search) and <Ctrl>+<Space> to ? (backwards search):
-map <space> /
-map <C-space> ?
-map <silent> <leader><cr> :noh<cr>
-
-" Clear highlighting after searching
-nnoremap <esc> :noh<return><esc>
-"-------------------------"
+" Clear highlight after search
+nnoremap <leader>c :noh<cr>
+"-------------------------
