@@ -1,4 +1,4 @@
-set shell=/usr/local/bin/fish 
+set shell=/bin/zsh
 let mapleader = " "
 set updatetime=200
 
@@ -6,6 +6,7 @@ call plug#begin()
 " THEMES, APPEARANCE --------------
 Plug 'ryanoasis/vim-devicons'
 Plug 'itchyny/lightline.vim'
+Plug 'maximbaz/lightline-ale'
 
 " MOVEMENT ------------------------
 Plug '/usr/local/opt/fzf'
@@ -18,7 +19,6 @@ Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
 Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
 Plug 'ycm-core/YouCompleteMe'
-Plug 'vim-syntastic/syntastic'
 
 " LANGUAGE SUPPORT ----------------
 Plug 'rust-lang/rust.vim'
@@ -27,9 +27,10 @@ Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install'  }
 
 " FORMATTING-----------------------
 Plug 'terryma/vim-expand-region'
-Plug 'junegunn/vi-easy-align'
+Plug 'junegunn/vim-easy-align'
 Plug 'Yggdroot/indentLine'
 Plug 'jiangmiao/auto-pairs'
+Plug 'dense-analysis/ale'
 
 " WRITING--------------------------
 Plug 'junegunn/goyo.vim'
@@ -55,7 +56,7 @@ map J <Plug>(expand_region_shrink)
 
 " Vim indentLine-----------------------------------------------
 " Prevent hiding characters in md, json
-let g:indentLine_setConceal = 0 
+let g:indentine_setConceal = 0
 
 " GOYO ---------------------------------------------------------
 noremap <leader>g :Goyo <CR>
@@ -65,11 +66,11 @@ nmap <leader>ff :Files <CR>
 nmap <leader>fc :Ag <CR>
 nmap <leader>fs :Snippets <CR>
 
-" File preview with Bat when using fzf 
+" File preview with Bat when using fzf
 command! -bang -nargs=? -complete=dir Files
     \ call fzf#vim#files(<q-args>, fzf#vim#with_preview(), <bang>0)
 
-" VIMTEX 
+" VIMTEX
 let g:tex_flavor='latex'
 let g:vimtex_quickfix_mode=0
 let g:tex_conceal='abdmg'
@@ -79,52 +80,72 @@ set conceallevel=1
 autocmd FileType tex nmap <buffer> <leader>lc :!xelatex %<CR>
 autocmd FileType tex nmap <buffer> Lp :!open -a Skim %:r.pdf<CR><CR>
 
-" Markdown preview 
+" Ale
+let g:ale_sign_column_always = 1
+let g:ale_fixers = {
+\   '*': ['remove_trailing_lines', 'trim_whitespace'],
+\   'javascript': ['prettier', 'eslint'],
+\}
+map <leader>af :ALEFix<CR>
+nmap <silent> <leader>ap <Plug>(ale_previous_wrap)
+nmap <silent> <leader>an <Plug>(ale_next_wrap)
+
+" Markdown preview
 nmap <leader>mp <Plug>MarkdownPreview
 
-" Syntastic
-let g:syntastic_enable_balloons = 1
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 1
-let g:syntastic_check_on_open = 0
-let g:syntastic_check_on_wq = 0
-" Let the size of error notice adjusts with content size
-function! SyntasticCheckHook(errors)
-    if !empty(a:errors)
-        let g:syntastic_loc_list_height = min([len(a:errors), 10])
-    endif
-endfunction
-
-" Vim Lightline 
+" Vim Lightline
 set noshowmode  " No insert display mode "
 
 function! FileNameWithIcon() abort
-  return winwidth(0) > 70  ?  WebDevIconsGetFileTypeSymbol() . ' ' . expand('%:t') : '' 
+  return winwidth(0) > 70  ?  WebDevIconsGetFileTypeSymbol() . ' ' . expand('%:t') : ''
 endfunction
 
 let g:lightline = {
-      \ 'colorscheme': 'seoul256',
+      \ 'colorscheme': 'landscape',
       \ 'active': {
       \   'left': [ [ 'mode', 'paste' ],
       \             [ 'gitbranch', 'readonly', 'filename_with_icon', 'modified' ] ],
-      \   'right': [['lineinfo', 'percent']]
+      \   'right': [['linter_checking', 'linter_errors', 'linter_warnings', 'linter_infos', 'linter_ok' ,'lineinfo', 'percent']]
       \ },
       \ 'component_function': {
       \   'gitbranch': 'gitbranch#name',
-      \   'filename_with_icon': 'FileNameWithIcon'	
+      \   'filename_with_icon': 'FileNameWithIcon'
       \ },
       \ }
 
-" UltiSnip 
+" Lightline Ale
+let g:lightline.component_expand = {
+      \  'linter_checking': 'lightline#ale#checking',
+      \  'linter_infos': 'lightline#ale#infos',
+      \  'linter_warnings': 'lightline#ale#warnings',
+      \  'linter_errors': 'lightline#ale#errors',
+      \  'linter_ok': 'lightline#ale#ok',
+      \ }
+
+let g:lightline.component_type = {
+      \     'linter_checking': 'right',
+      \     'linter_infos': 'right',
+      \     'linter_warnings': 'warning',
+      \     'linter_errors': 'error',
+      \     'linter_ok': 'right',
+      \ }
+
+let g:lightline#ale#indicator_checking = "\uf110"
+let g:lightline#ale#indicator_infos = "\uf129"
+let g:lightline#ale#indicator_warnings = "\uf071"
+let g:lightline#ale#indicator_errors = "\uf05e"
+let g:lightline#ale#indicator_ok = "\uf00c"
+
+" UltiSnip
 let g:UltiSnipsExpandTrigger="qq"
 
-" YouCompleteMe 
+" YouCompleteMe
 let g:ycm_global_ycm_extra_conf = '~/.config/nvim/configuration/.ycm_extra_conf.py'
 
 " rustfmt
 let g:rustfmt_autosave = 1
 
-" NERD TREE 
+" NERD TREE
 map <leader>fn :NERDTreeToggle<CR>
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 
@@ -133,10 +154,10 @@ let g:NERDTreeFileExtensionHighlightFullName = 1
 let g:NERDTreeExactMatchHighlightFullName = 1
 let g:NERDTreePatternMatchHighlightFullName = 1
 
-" Devicons 
+" Devicons
 let g:webdevicons_conceal_nerdtree_brackets = 0
 
-" Tagbar 
+" Tagbar
 nmap <leader>tt :TagbarToggle<CR>
 
 "----------------------General Configuration -----------------
@@ -236,16 +257,23 @@ nnoremap <leader>wj <C-w>j
 nnoremap <leader>wk <C-w>k
 nnoremap <leader>wl <C-w>l
 
+" Buffer resize
+nnoremap <leader>= <C-w>=<CR>
+nnoremap <silent> <Leader>+ :exe "resize " . (winheight(0) * 5/3)<CR>
+nnoremap <silent> <Leader>- :exe "resize " . (winheight(0) * 2/3)<CR>
+nnoremap <silent> <Leader>] :exe "resize " . (winwidth(0) * 5/3)<CR>
+nnoremap <silent> <Leader>[ :exe "resize " . (winwidth(0) * 2/3)<CR>
+
 " Moving Code Blocks
-vnoremap < <gv 
+vnoremap < <gv
 vnoremap > >g
 
 " Copy to system's clipboard
 vnoremap <C-c> "*y
 
-" Escaping insert mode 
+" Escaping insert mode
 inoremap jk <esc>
 inoremap kj <esc>
 
-" Clear highlight 
+" Clear highlight
 nnoremap <leader>c :noh<cr>
