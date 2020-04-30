@@ -1,19 +1,15 @@
-set shell=/bin/zsh
+set shell=/usr/local/bin/fish
 let mapleader = " "
 set updatetime=200
 
 call plug#begin()
 " THEMES, APPEARANCE --------------
 Plug 'ryanoasis/vim-devicons'
-Plug 'itchyny/lightline.vim'
-Plug 'maximbaz/lightline-ale'
 
 " MOVEMENT ------------------------
 Plug '/usr/local/opt/fzf'
 Plug 'junegunn/fzf.vim'
 Plug 'majutsushi/tagbar'
-Plug 'scrooloose/nerdtree'
-Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
 
 " SNIPPETS, CODE COMPLETE----------
 Plug 'SirVer/ultisnips'
@@ -21,6 +17,7 @@ Plug 'honza/vim-snippets'
 Plug 'ycm-core/YouCompleteMe'
 
 " LANGUAGE SUPPORT ----------------
+Plug 'tpope/vim-dispatch'
 Plug 'rust-lang/rust.vim'
 Plug 'lervag/vimtex'
 Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install'  }
@@ -56,12 +53,13 @@ map J <Plug>(expand_region_shrink)
 
 " Vim indentLine-----------------------------------------------
 " Prevent hiding characters in md, json
-let g:indentine_setConceal = 0
+let g:indentLine_setConceal = 0
 
 " GOYO ---------------------------------------------------------
 noremap <leader>g :Goyo <CR>
 
 " fzf fuzzy file searching -------------------------------------
+" set rtp+=/usr/local/opt/fzf
 nmap <leader>ff :Files <CR>
 nmap <leader>fc :Ag <CR>
 nmap <leader>fs :Snippets <CR>
@@ -93,75 +91,22 @@ nmap <silent> <leader>an <Plug>(ale_next_wrap)
 " Markdown preview
 nmap <leader>mp <Plug>MarkdownPreview
 
-" Vim Lightline
-set noshowmode  " No insert display mode "
-
-function! FileNameWithIcon() abort
-  return winwidth(0) > 70  ?  WebDevIconsGetFileTypeSymbol() . ' ' . expand('%:t') : ''
-endfunction
-
-let g:lightline = {
-      \ 'colorscheme': 'landscape',
-      \ 'active': {
-      \   'left': [ [ 'mode', 'paste' ],
-      \             [ 'gitbranch', 'readonly', 'filename_with_icon', 'modified' ] ],
-      \   'right': [['linter_checking', 'linter_errors', 'linter_warnings', 'linter_infos', 'linter_ok' ,'lineinfo', 'percent']]
-      \ },
-      \ 'component_function': {
-      \   'gitbranch': 'gitbranch#name',
-      \   'filename_with_icon': 'FileNameWithIcon'
-      \ },
-      \ }
-
-" Lightline Ale
-let g:lightline.component_expand = {
-      \  'linter_checking': 'lightline#ale#checking',
-      \  'linter_infos': 'lightline#ale#infos',
-      \  'linter_warnings': 'lightline#ale#warnings',
-      \  'linter_errors': 'lightline#ale#errors',
-      \  'linter_ok': 'lightline#ale#ok',
-      \ }
-
-let g:lightline.component_type = {
-      \     'linter_checking': 'right',
-      \     'linter_infos': 'right',
-      \     'linter_warnings': 'warning',
-      \     'linter_errors': 'error',
-      \     'linter_ok': 'right',
-      \ }
-
-let g:lightline#ale#indicator_checking = "\uf110"
-let g:lightline#ale#indicator_infos = "\uf129"
-let g:lightline#ale#indicator_warnings = "\uf071"
-let g:lightline#ale#indicator_errors = "\uf05e"
-let g:lightline#ale#indicator_ok = "\uf00c"
-
 " UltiSnip
 let g:UltiSnipsExpandTrigger="qq"
 
 " YouCompleteMe
 let g:ycm_global_ycm_extra_conf = '~/.config/nvim/configuration/.ycm_extra_conf.py'
 
+" Dispatch
+nnoremap <leader>mc :Dispatch! make
+
 " rustfmt
 let g:rustfmt_autosave = 1
-
-" NERD TREE
-map <leader>fn :NERDTreeToggle<CR>
-autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
-
-" NERD TREE HIGHLIGHT
-let g:NERDTreeFileExtensionHighlightFullName = 1
-let g:NERDTreeExactMatchHighlightFullName = 1
-let g:NERDTreePatternMatchHighlightFullName = 1
-
-" Devicons
-let g:webdevicons_conceal_nerdtree_brackets = 0
 
 " Tagbar
 nmap <leader>tt :TagbarToggle<CR>
 
 "----------------------General Configuration -----------------
-colorscheme murphy
 set visualbell
 set wildmenu
 set wildmode=full
@@ -181,6 +126,34 @@ set breakindent showbreak=..
 
 set ignorecase
 set smartcase
+
+" Statusline
+function! GitBranch()
+  return system("git rev-parse --abbrev-ref HEAD 2>/dev/null | tr -d '\n'")
+endfunction
+
+function! StatuslineGit()
+  let l:branchname = GitBranch()
+  return strlen(l:branchname) > 0?'  '.l:branchname.' ':''
+endfunction
+
+function! FileNameWithIcon() abort
+  return winwidth(0) > 70  ?  WebDevIconsGetFileTypeSymbol() . ' ' . expand('%:t') : ''
+endfunction
+
+set statusline=
+set statusline+=%{StatuslineGit()}
+set statusline+=\|\ 
+set statusline+=%{FileNameWithIcon()}
+set statusline+=\ %m
+set statusline+=%=
+set statusline+=%#CursorColumn#
+set statusline+=\ %y
+set statusline+=\ %{&fileencoding?&fileencoding:&encoding}
+set statusline+=\[%{&fileformat}\]
+set statusline+=\ %p%%
+set statusline+=\ %l:%c
+set statusline+=\ 
 
 " No backup file
 set noswapfile
@@ -277,3 +250,12 @@ inoremap kj <esc>
 
 " Clear highlight
 nnoremap <leader>c :noh<cr>
+
+" Netrw settings
+" Open in vertical split by default
+nnoremap <leader>fn :Vex <CR> 
+let g:netrw_banner = 0
+let g:netrw_browse_split = 2
+let g:netrw_liststyle = 3
+let g:netrw_winsize = 20
+"-------------------------------------
