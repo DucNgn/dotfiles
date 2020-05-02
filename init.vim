@@ -1,4 +1,4 @@
-set shell=/usr/local/bin/fish
+set shell=/usr/bin/fish
 let mapleader = " "
 set updatetime=200
 
@@ -18,6 +18,7 @@ Plug 'ycm-core/YouCompleteMe'
 
 " LANGUAGE SUPPORT ----------------
 Plug 'tpope/vim-dispatch'
+Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 Plug 'rust-lang/rust.vim'
 Plug 'lervag/vimtex'
 Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install'  }
@@ -56,7 +57,7 @@ map J <Plug>(expand_region_shrink)
 let g:indentLine_setConceal = 0
 
 " GOYO ---------------------------------------------------------
-noremap <leader>g :Goyo <CR>
+noremap <leader>G :Goyo <CR>
 
 " fzf fuzzy file searching -------------------------------------
 " set rtp+=/usr/local/opt/fzf
@@ -103,10 +104,21 @@ nnoremap <leader>mc :Dispatch! make
 " rustfmt
 let g:rustfmt_autosave = 1
 
+" Go Supports
+nnoremap <leader>gb :GoBuild <CR>
+nnoremap <leader>gi :GoInstall <CR>
+nnoremap <leader>gr :GoRun <CR>
+nnoremap <leader>gd :GoDoc <CR>
+nnoremap <leader>grn :GoRename
+nnoremap <leader>gf :GoLint<CR>
+
 " Tagbar
 nmap <leader>tt :TagbarToggle<CR>
 
-"----------------------General Configuration -----------------
+"----------------------Configuration -----------------
+
+set guicursor=i:blinkwait700-blinkon400-blinkoff250 " Cursor blinking"
+
 set visualbell
 set wildmenu
 set wildmode=full
