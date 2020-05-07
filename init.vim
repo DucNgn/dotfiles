@@ -1,9 +1,10 @@
-set shell=/usr/bin/fish
+set shell=/usr/local/bin/fish
 let mapleader = " "
 set updatetime=200
 
 call plug#begin()
 " THEMES, APPEARANCE --------------
+Plug 'kyoz/purify', { 'rtp': 'vim' }
 Plug 'ryanoasis/vim-devicons'
 
 " MOVEMENT ------------------------
@@ -24,6 +25,7 @@ Plug 'lervag/vimtex'
 Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install'  }
 
 " FORMATTING-----------------------
+Plug 'luochen1990/rainbow'
 Plug 'terryma/vim-expand-region'
 Plug 'junegunn/vim-easy-align'
 Plug 'Yggdroot/indentLine'
@@ -34,6 +36,7 @@ Plug 'dense-analysis/ale'
 Plug 'junegunn/goyo.vim'
 
 " MISC ----------------------------
+Plug 'preservim/nerdtree'
 Plug 'wakatime/vim-wakatime'
 Plug 'itchyny/vim-gitbranch'
 
@@ -115,10 +118,20 @@ nnoremap <leader>gf :GoLint<CR>
 " Tagbar
 nmap <leader>tt :TagbarToggle<CR>
 
+" Rainbow bracket
+let g:rainbow_active = 1 
+
+" Nerd tree
+" Open Nerd tree when no file specificed
+autocmd StdinReadPre * let s:std_in=1
+autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
+
+map <leader>fn :NERDTreeToggle<CR>
+" Close vim when the only openning window left is nerd tree
+autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+
 "----------------------Configuration -----------------
-
-set guicursor=i:blinkwait700-blinkon400-blinkoff250 " Cursor blinking"
-
+colorscheme purify
 set visualbell
 set wildmenu
 set wildmode=full
@@ -262,12 +275,4 @@ inoremap kj <esc>
 
 " Clear highlight
 nnoremap <leader>c :noh<cr>
-
-" Netrw settings
-" Open in vertical split by default
-nnoremap <leader>fn :Vex <CR> 
-let g:netrw_banner = 0
-let g:netrw_browse_split = 2
-let g:netrw_liststyle = 3
-let g:netrw_winsize = 20
 "-------------------------------------
