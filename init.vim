@@ -1,65 +1,39 @@
-set shell=/usr/local/bin/fish
 let mapleader = " "
-set updatetime=200
 
 call plug#begin()
-" THEMES, APPEARANCE --------------
-Plug 'ryanoasis/vim-devicons'
-
-" MOVEMENT ------------------------
+" Fuzzy file search
 Plug '/usr/local/opt/fzf'
 Plug 'junegunn/fzf.vim'
-Plug 'majutsushi/tagbar'
 
-" SNIPPETS, CODE COMPLETE----------
+" Auto completion
+Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+
+" Syntax
+Plug 'vim-syntastic/syntastic'
+
+" TypeScript
+Plug 'HerringtonDarkholme/yats.vim'
+Plug 'mhartington/nvim-typescript', {'do': './install.sh'}
+
+" Latex
+Plug 'lervag/vimtex'
+
+" Snippets
 Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
-Plug 'ycm-core/YouCompleteMe'
 
-" LANGUAGE SUPPORT ----------------
-Plug 'tpope/vim-dispatch'
-Plug 'rust-lang/rust.vim'
-Plug 'lervag/vimtex'
-Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install'  }
-
-" FORMATTING-----------------------
-Plug 'terryma/vim-expand-region'
-Plug 'junegunn/vim-easy-align'
-Plug 'Yggdroot/indentLine'
+" MISC
+Plug 'co1ncidence/mountaineer.vim'
 Plug 'jiangmiao/auto-pairs'
-Plug 'dense-analysis/ale'
-
-" WRITING--------------------------
-Plug 'junegunn/goyo.vim'
-
-" MISC ----------------------------
+Plug 'luochen1990/rainbow'
+Plug 'ryanoasis/vim-devicons'
 Plug 'wakatime/vim-wakatime'
-Plug 'itchyny/vim-gitbranch'
+Plug 'tpope/vim-fugitive'
 
 call plug#end()
 
-"---CONFIG----
-
-" Vim easy align-----------------------------------------------
-" Start interactive EasyAlign in visual mode (e.g. vipga)
-xmap ga <Plug>(EasyAlign)
-
-" Start interactive EasyAlign for a motion/text object (e.g. gaip)
-nmap ga <Plug>(EasyAlign)
-
-" Vim Expand region --------------------------------------------
-map K <Plug>(expand_region_expand)
-map J <Plug>(expand_region_shrink)
-
-" Vim indentLine-----------------------------------------------
-" Prevent hiding characters in md, json
-let g:indentLine_setConceal = 0
-
-" GOYO ---------------------------------------------------------
-noremap <leader>g :Goyo <CR>
-
-" fzf fuzzy file searching -------------------------------------
-" set rtp+=/usr/local/opt/fzf
+" Plugin config --------
+" Fzf
 nmap <leader>ff :Files <CR>
 nmap <leader>fc :Ag <CR>
 nmap <leader>fs :Snippets <CR>
@@ -67,6 +41,21 @@ nmap <leader>fs :Snippets <CR>
 " File preview with Bat when using fzf
 command! -bang -nargs=? -complete=dir Files
     \ call fzf#vim#files(<q-args>, fzf#vim#with_preview(), <bang>0)
+
+
+" Deoplete 
+let g:deoplete#enable_at_startup = 1
+inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+
+" Syntastic
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
 
 " VIMTEX
 let g:tex_flavor='latex'
@@ -78,39 +67,19 @@ set conceallevel=1
 autocmd FileType tex nmap <buffer> <leader>lc :!xelatex %<CR>
 autocmd FileType tex nmap <buffer> Lp :!open -a Skim %:r.pdf<CR><CR>
 
-" Ale
-let g:ale_sign_column_always = 1
-let g:ale_fixers = {
-\   '*': ['remove_trailing_lines', 'trim_whitespace'],
-\   'javascript': ['prettier', 'eslint'],
-\}
-map <leader>af :ALEFix<CR>
-nmap <silent> <leader>ap <Plug>(ale_previous_wrap)
-nmap <silent> <leader>an <Plug>(ale_next_wrap)
+" Rainbow
+let g:rainbow_active = 1 
 
-" Markdown preview
-nmap <leader>mp <Plug>MarkdownPreview
-
-" UltiSnip
-let g:UltiSnipsExpandTrigger="qq"
-
-" YouCompleteMe
-let g:ycm_global_ycm_extra_conf = '~/.config/nvim/configuration/.ycm_extra_conf.py'
-
-" Dispatch
-nnoremap <leader>mc :Dispatch! make
-
-" rustfmt
-let g:rustfmt_autosave = 1
-
-" Tagbar
-nmap <leader>tt :TagbarToggle<CR>
 
 "----------------------General Configuration -----------------
+colorscheme mountaineer-grey
+
+nmap cs :colorscheme
+
 set visualbell
 set wildmenu
 set wildmode=full
-set tabstop=2
+set tabstop=4
 set shiftwidth=4
 set expandtab
 set title
@@ -132,18 +101,13 @@ function! GitBranch()
   return system("git rev-parse --abbrev-ref HEAD 2>/dev/null | tr -d '\n'")
 endfunction
 
-function! StatuslineGit()
-  let l:branchname = GitBranch()
-  return strlen(l:branchname) > 0?'  '.l:branchname.' ':''
-endfunction
-
 function! FileNameWithIcon() abort
   return winwidth(0) > 70  ?  WebDevIconsGetFileTypeSymbol() . ' ' . expand('%:t') : ''
 endfunction
 
 set statusline=
-set statusline+=%{StatuslineGit()}
-set statusline+=\|\ 
+set statusline+=%{FugitiveStatusline()}
+set statusline+=\ \ 
 set statusline+=%{FileNameWithIcon()}
 set statusline+=\ %m
 set statusline+=%=
@@ -259,3 +223,5 @@ let g:netrw_browse_split = 2
 let g:netrw_liststyle = 3
 let g:netrw_winsize = 20
 "-------------------------------------
+
+
