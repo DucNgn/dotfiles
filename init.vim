@@ -5,16 +5,6 @@ call plug#begin()
 Plug '/usr/local/opt/fzf'
 Plug 'junegunn/fzf.vim'
 
-" Auto completion
-Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-
-" Syntax
-Plug 'vim-syntastic/syntastic'
-
-" TypeScript
-Plug 'HerringtonDarkholme/yats.vim'
-Plug 'mhartington/nvim-typescript', {'do': './install.sh'}
-
 " Latex
 Plug 'lervag/vimtex'
 
@@ -23,7 +13,6 @@ Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
 
 " MISC
-Plug 'co1ncidence/mountaineer.vim'
 Plug 'jiangmiao/auto-pairs'
 Plug 'luochen1990/rainbow'
 Plug 'ryanoasis/vim-devicons'
@@ -47,16 +36,6 @@ command! -bang -nargs=? -complete=dir Files
 let g:deoplete#enable_at_startup = 1
 inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
 
-" Syntastic
-set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
-set statusline+=%*
-
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 1
-let g:syntastic_check_on_open = 1
-let g:syntastic_check_on_wq = 0
-
 " VIMTEX
 let g:tex_flavor='latex'
 let g:vimtex_quickfix_mode=0
@@ -72,8 +51,6 @@ let g:rainbow_active = 1
 
 
 "----------------------General Configuration -----------------
-colorscheme mountaineer-grey
-
 nmap cs :colorscheme
 
 set visualbell
@@ -223,5 +200,4 @@ let g:netrw_browse_split = 2
 let g:netrw_liststyle = 3
 let g:netrw_winsize = 20
 "-------------------------------------
-
 
