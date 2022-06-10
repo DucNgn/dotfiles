@@ -1,6 +1,7 @@
 # Dotfiles
 
 ### Currently, having dotfiles of:
++ LunarVim
 + Neovim / Vim
 + Tmux
 + Skhd
