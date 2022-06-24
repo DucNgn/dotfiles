@@ -34,6 +34,7 @@ lvim.builtin.treesitter.ensure_installed = {
   "yaml",
 }
 
+
 -- ***********
 -- Keybindings
 -- ***********
@@ -47,6 +48,10 @@ vim.cmd("nnoremap cc ddko")
 vim.cmd("nnoremap j gj")
 vim.cmd("nnoremap k gk")
 vim.cmd("nnoremap <Leader>F <cmd>lua GrepInputString()<CR>")
+
+
+lvim.keys.normal_mode["<Leader>bn"] = ":bnext<CR>"
+lvim.keys.normal_mode["<Leader>bx"] = ":bp <BAR> bd #<CR>"
 
 lvim.keys.visual_block_mode.J = false
 lvim.keys.visual_block_mode.K = false
@@ -90,6 +95,10 @@ lvim.plugins = {
   { "tpope/vim-repeat" },
   { "tpope/vim-surround", keys = { "c", "d", "y" } },
   { "vim-test/vim-test" },
+  {
+    "npxbr/glow.nvim",
+    ft = { "markdown" }
+  },
 }
 
 -- ***
