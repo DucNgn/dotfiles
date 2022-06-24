@@ -10,18 +10,10 @@ vim.opt.shortmess = vim.opt.shortmess + "I"
 vim.opt.lazyredraw = true
 vim.opt.relativenumber = true
 
-lvim.format_on_save = false
-lvim.autocommands.custom_groups = {
-  {
-    "BufWritePre",
-    "*",
-    ":silent lua vim.lsp.buf.formatting_seq_sync()",
-  },
-}
+lvim.format_on_save = true
 
 lvim.builtin.alpha.active = false
 lvim.builtin.project.active = false
-lvim.builtin.nvimtree.show_icons.git = 0
 lvim.builtin.telescope.defaults.prompt_prefix = " "
 lvim.builtin.telescope.defaults.path_display.shorten = nil
 lvim.builtin.telescope.pickers = {
@@ -93,7 +85,6 @@ lvim.plugins = {
   { "ggandor/lightspeed.nvim" },
   { "jose-elias-alvarez/nvim-lsp-ts-utils" },
   { "jxnblk/vim-mdx-js" },
-  { "rcarriga/vim-ultest" },
   { "rose-pine/neovim" },
   { "tpope/vim-abolish" },
   { "tpope/vim-repeat" },
