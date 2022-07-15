@@ -2,8 +2,7 @@
 -- Settings
 -- ********
 
-lvim.colorscheme = "rose-pine"
-vim.g.rose_pine_variant = 'moon'
+lvim.colorscheme = "default"
 
 vim.opt.timeoutlen = 500
 vim.opt.shortmess = vim.opt.shortmess + "I"
@@ -90,7 +89,6 @@ lvim.plugins = {
   { "ggandor/lightspeed.nvim" },
   { "jose-elias-alvarez/nvim-lsp-ts-utils" },
   { "jxnblk/vim-mdx-js" },
-  { "rose-pine/neovim" },
   { "tpope/vim-abolish" },
   { "tpope/vim-repeat" },
   { "tpope/vim-surround", keys = { "c", "d", "y" } },
