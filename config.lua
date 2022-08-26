@@ -2,14 +2,15 @@
 -- Settings
 -- ********
 
-lvim.colorscheme = "default"
+
+lvim.colorscheme = "arctic"
 
 vim.opt.timeoutlen = 500
 vim.opt.shortmess = vim.opt.shortmess + "I"
 vim.opt.lazyredraw = true
 vim.opt.relativenumber = true
 
-lvim.format_on_save = true
+lvim.format_on_save = false
 
 lvim.builtin.alpha.active = false
 lvim.builtin.project.active = false
@@ -92,11 +93,11 @@ lvim.plugins = {
   { "tpope/vim-abolish" },
   { "tpope/vim-repeat" },
   { "tpope/vim-surround", keys = { "c", "d", "y" } },
-  { "vim-test/vim-test" },
   {
     "npxbr/glow.nvim",
     ft = { "markdown" }
   },
+  { "rockyzhang24/arctic.nvim", requires = { "rktjmp/lush.nvim" } }
 }
 
 -- ***
