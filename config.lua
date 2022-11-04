@@ -5,6 +5,7 @@ lvim.format_on_save = true
 lvim.lint_on_save = true
 vim.opt.lazyredraw = true
 vim.opt.relativenumber = true
+lvim.builtin.terminal.shell = "/bin/zsh"
 
 -- theme
 vim.termguicolors = true
@@ -43,9 +44,10 @@ lvim.builtin.treesitter.ensure_installed = {
   "rust",
   "java",
   "yaml",
-  "latex",
+  "latex"
 }
 lvim.builtin.treesitter.highlight.enable = true
+lvim.builtin.telescope.pickers.find_files.previewer = nil
 
 -- LSP
 lvim.lsp.automatic_servers_installation = false
@@ -113,14 +115,19 @@ lvim.plugins = {
   },
   { "nicknikolov/dark-matter.vim" },
   { "FrenzyExists/aquarium-vim" },
-  { "christoomey/vim-tmux-navigator" },
+  {
+    "aserowy/tmux.nvim",
+    config = function()
+      require("tmux").setup()
+    end,
+  },
   { "p00f/nvim-ts-rainbow" },
 }
 
 -- Plugin Settings
 lvim.keys.normal_mode["<C-k>"] = "<cmd>ZenMode<cr>"
 
--- Autocmd for LaTeX
+-- Autocmd for LaTeX: Compile & Preview with Skim
 vim.api.nvim_create_autocmd({ "BufEnter" }, {
   pattern = {
     "*.tex"
@@ -132,3 +139,9 @@ vim.api.nvim_create_autocmd({ "BufEnter" }, {
     ]]
   end,
 })
+
+-- Enable spell checking for certain file types
+vim.api.nvim_create_autocmd(
+  { "BufRead", "BufNewFile" },
+  { pattern = { "*.txt", "*.md", "*.tex" }, command = "setlocal spell" }
+)
