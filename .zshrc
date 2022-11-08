@@ -17,5 +17,7 @@ eval "$(fnm env --use-on-cd)"
 export PATH="/Users/dnguyen/.local/bin:$PATH"
 
 antigen theme lambda
+alias lv="lvim"
+cd ~/ws
 antigen apply
 
