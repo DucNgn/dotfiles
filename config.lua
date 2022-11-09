@@ -9,7 +9,6 @@ lvim.builtin.terminal.shell = "/bin/zsh"
 
 -- theme
 vim.termguicolors = true
-lvim.colorscheme = "aquarium"
 
 -- keymappings [view all the defaults by pressing <leader>Lk]
 lvim.leader = "space"
@@ -17,6 +16,7 @@ lvim.leader = "space"
 lvim.keys.normal_mode["<C-s>"] = ":w<cr>"
 lvim.keys.normal_mode["<S-l>"] = ":BufferLineCycleNext<CR>"
 lvim.keys.normal_mode["<S-h>"] = ":BufferLineCyclePrev<CR>"
+lvim.keys.normal_mode["<S-x>"] = ":bp <BAR> bd #<CR>"
 lvim.keys.normal_mode["Q"] = "<nop>"
 
 lvim.keys.insert_mode["kj"] = "<Esc>"
@@ -64,7 +64,6 @@ formatters.setup({
     exe = "rustfmt",
     filetype = { "rust" },
   },
-  { exe = "prettier" },
   { exe = "gofmt", filetypes = { "go" } },
   { exe = "stylua", filetypes = { "lua" } },
 })
@@ -113,8 +112,6 @@ lvim.plugins = {
       vim.api.nvim_command("augroup END")
     end
   },
-  { "nicknikolov/dark-matter.vim" },
-  { "FrenzyExists/aquarium-vim" },
   {
     "aserowy/tmux.nvim",
     config = function()
@@ -122,6 +119,11 @@ lvim.plugins = {
     end,
   },
   { "p00f/nvim-ts-rainbow" },
+  { "karb94/neoscroll.nvim",
+    config = function()
+      require("neoscroll").setup()
+    end
+  }
 }
 
 -- Plugin Settings
