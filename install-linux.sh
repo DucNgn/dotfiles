@@ -12,6 +12,9 @@ NC='\033[0m' # No Color
 # Script directory for relative paths
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# Package manager detection
+PKG_MANAGER=""
+
 # Helper functions
 print_info() {
     echo -e "${BLUE}ℹ${NC} $1"
@@ -29,26 +32,40 @@ print_warning() {
     echo -e "${YELLOW}⚠${NC} $1"
 }
 
-# Check if package is installed via apt
-check_package_exists_apt() {
+# Check if package is installed
+check_package_exists() {
     local package=$1
-    dpkg -l | grep -q "^ii  $package" 2>/dev/null
+
+    if [ "$PKG_MANAGER" = "apt" ]; then
+        dpkg -l | grep -q "^ii  $package" 2>/dev/null
+    elif [ "$PKG_MANAGER" = "apk" ]; then
+        apk info 2>/dev/null | grep -q "^$package" 2>/dev/null
+    fi
 }
 
-# Install a package via apt
-install_package_apt() {
+# Install a package
+install_package() {
     local package=$1
 
-    if check_package_exists_apt "$package"; then
+    if check_package_exists "$package"; then
         print_success "$package is already installed"
         return 0
     fi
 
     print_info "Installing $package..."
-    sudo apt-get install -y "$package" || {
-        print_error "Failed to install $package"
-        return 1
-    }
+
+    if [ "$PKG_MANAGER" = "apt" ]; then
+        sudo apt-get install -y "$package" || {
+            print_error "Failed to install $package"
+            return 1
+        }
+    elif [ "$PKG_MANAGER" = "apk" ]; then
+        sudo apk add "$package" || {
+            print_error "Failed to install $package"
+            return 1
+        }
+    fi
+
     print_success "$package installed successfully"
 }
 
@@ -117,14 +134,18 @@ setup_tmux() {
 preflight_checks() {
     print_info "Running preflight checks..."
 
-    # Check if apt is available
-    if ! command -v apt-get &> /dev/null; then
-        print_error "apt is not available on this system"
-        print_info "This script is designed for Debian/Ubuntu-based systems"
+    # Detect package manager
+    if command -v apt-get &> /dev/null; then
+        PKG_MANAGER="apt"
+        print_success "Detected apt (Debian/Ubuntu)"
+    elif command -v apk &> /dev/null; then
+        PKG_MANAGER="apk"
+        print_success "Detected apk (Alpine Linux)"
+    else
+        print_error "No supported package manager found (apt or apk)"
+        print_info "This script supports Debian/Ubuntu and Alpine Linux"
         exit 1
     fi
-
-    print_success "apt is available"
 
     # Check sudo access
     if ! sudo -n true 2>/dev/null; then
@@ -144,7 +165,7 @@ install_cli_utilities() {
     local failed=0
 
     for package in "${packages[@]}"; do
-        install_package_apt "$package" || failed=$((failed + 1))
+        install_package "$package" || failed=$((failed + 1))
     done
 
     return $failed
@@ -155,13 +176,17 @@ install_system_tools() {
     print_info ""
     print_info "Installing System Tools..."
 
-    # dnsutils provides nslookup
-    local packages=("dnsutils")
+    local package
     local failed=0
 
-    for package in "${packages[@]}"; do
-        install_package_apt "$package" || failed=$((failed + 1))
-    done
+    # Different package names for different package managers
+    if [ "$PKG_MANAGER" = "apt" ]; then
+        package="dnsutils"  # provides nslookup
+    elif [ "$PKG_MANAGER" = "apk" ]; then
+        package="bind-tools"  # provides nslookup
+    fi
+
+    install_package "$package" || failed=$((failed + 1))
 
     return $failed
 }
@@ -174,7 +199,7 @@ install_development_tools() {
     local failed=0
 
     # Install neovim
-    install_package_apt "neovim" || failed=$((failed + 1))
+    install_package "neovim" || failed=$((failed + 1))
 
     # Setup neovim with lazyvim
     if [ $failed -eq 0 ]; then
@@ -182,7 +207,7 @@ install_development_tools() {
     fi
 
     # Install zsh
-    install_package_apt "zsh" || failed=$((failed + 1))
+    install_package "zsh" || failed=$((failed + 1))
 
     # Setup zsh
     if [ $failed -eq 0 ]; then
@@ -190,7 +215,7 @@ install_development_tools() {
     fi
 
     # Install tmux
-    install_package_apt "tmux" || failed=$((failed + 1))
+    install_package "tmux" || failed=$((failed + 1))
 
     # Setup tmux
     if [ $failed -eq 0 ]; then
