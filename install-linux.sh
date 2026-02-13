@@ -15,12 +15,17 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Package manager detection
 PKG_MANAGER=""
 
-# Run command with sudo if not root
+# Run command with sudo if needed
 run_with_sudo() {
-    if [ "$EUID" -eq 0 ]; then
+    if [ "$(id -u)" -eq 0 ]; then
+        # Already root, run directly
         "$@"
-    else
+    elif command -v sudo &> /dev/null; then
+        # Not root but sudo exists
         sudo "$@"
+    else
+        # Not root and sudo doesn't exist, try running anyway
+        "$@"
     fi
 }
 
