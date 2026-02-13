@@ -1,23 +1,28 @@
-if [ "$TMUX" = "" ]; then tmux; fi
+# Homebrew (macOS only)
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  export PATH="/opt/homebrew/bin:$PATH"
+fi
 
-source ~/antigen.zsh
-
+# Antigen - plugin management
+source ~/.config/antigen.zsh
 antigen use oh-my-zsh
 
+# Essential bundles
 antigen bundle git
+antigen bundle command-not-found
+antigen bundle agkozak/zsh-z
 antigen bundle zsh-users/zsh-syntax-highlighting
 antigen bundle zsh-users/zsh-autosuggestions
-antigen bundle agkozak/zsh-z
-antigen bundle jeffreytse/zsh-vi-mode
 
-ZVM_VI_INSERT_ESCAPE_BINDKEY=jk
-
-eval "$(fnm env --use-on-cd)"
-
-export PATH="/Users/dnguyen/.local/bin:$PATH"
-
-antigen theme lambda
-alias lv="lvim"
-cd ~/ws
 antigen apply
 
+# Vim mode with history search
+bindkey -v
+bindkey ^R history-incremental-search-backward
+bindkey ^S history-incremental-search-forward
+
+# Local binaries
+export PATH="$HOME/.local/bin:$PATH"
+
+# Aliases
+alias nv="nvim"
