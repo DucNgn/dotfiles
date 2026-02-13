@@ -180,6 +180,11 @@ install_cli_utilities() {
         install_package "$package" || failed=$((failed + 1))
     done
 
+    # Setup tmux config after installation
+    if [ $failed -eq 0 ]; then
+        setup_tmux || failed=$((failed + 1))
+    fi
+
     return $failed
 }
 
