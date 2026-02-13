@@ -110,10 +110,14 @@ setup_tmux() {
     if [ -f "$tmux_conf_path" ]; then
         print_info "Copying tmux.conf..."
         cp "$tmux_conf_path" "$HOME/.config/tmux/tmux.conf" || {
-            print_error "Failed to copy tmux.conf"
+            print_error "Failed to copy tmux.conf to ~/.config/tmux"
             return 1
         }
-        print_success "tmux.conf copied to $HOME/.config/tmux"
+        cp "$tmux_conf_path" "$HOME/.tmux.conf" || {
+            print_error "Failed to copy tmux.conf to home folder"
+            return 1
+        }
+        print_success "tmux.conf copied to ~/.config/tmux and ~/.tmux.conf"
     else
         print_error "No tmux.conf found in $SCRIPT_DIR"
         return 1
