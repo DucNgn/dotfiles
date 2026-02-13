@@ -36,6 +36,10 @@ print_error() {
     echo -e "${RED}✗${NC} $1"
 }
 
+print_warning() {
+    echo -e "${YELLOW}⚠${NC} $1"
+}
+
 # Detect package manager and install neovim
 install_neovim() {
     print_info "Checking for neovim..."
