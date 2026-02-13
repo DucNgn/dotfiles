@@ -118,6 +118,23 @@ setup_tmux() {
             return 1
         }
         print_success "tmux.conf copied to ~/.config/tmux and ~/.tmux.conf"
+
+        # Install tpm plugins if tpm is installed
+        if [ -f "$HOME/.tmux/plugins/tpm/bin/install_plugins" ]; then
+            print_info "Installing tmux plugins..."
+            "$HOME/.tmux/plugins/tpm/bin/install_plugins" || {
+                print_warning "Failed to install tmux plugins (this may be normal if tpm needs to be cloned first)"
+            }
+        fi
+
+        # Reload tmux config
+        if command -v tmux &> /dev/null; then
+            print_info "Reloading tmux config..."
+            tmux source-file "$HOME/.tmux.conf" 2>/dev/null || {
+                print_warning "Could not reload tmux (no active tmux session, it will reload on next session start)"
+            }
+            print_success "Tmux config reloaded"
+        fi
     else
         print_error "No tmux.conf found in $SCRIPT_DIR"
         return 1
