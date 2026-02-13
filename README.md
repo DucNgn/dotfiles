@@ -1,10 +1,8 @@
 # Dotfiles
 
-+ LunarVim
-+ Neovim / Vim
++ Lazyvim / Vim
 + Tmux
-+ Skhd
-+ Chunkwm
++ Alacritty
 
 
 
