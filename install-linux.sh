@@ -15,6 +15,15 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Package manager detection
 PKG_MANAGER=""
 
+# Run command with sudo if not root
+run_with_sudo() {
+    if [ "$EUID" -eq 0 ]; then
+        "$@"
+    else
+        sudo "$@"
+    fi
+}
+
 # Helper functions
 print_info() {
     echo -e "${BLUE}ℹ${NC} $1"
@@ -55,12 +64,12 @@ install_package() {
     print_info "Installing $package..."
 
     if [ "$PKG_MANAGER" = "apt" ]; then
-        sudo apt-get install -y "$package" || {
+        run_with_sudo apt-get install -y "$package" || {
             print_error "Failed to install $package"
             return 1
         }
     elif [ "$PKG_MANAGER" = "apk" ]; then
-        sudo apk add "$package" || {
+        run_with_sudo apk add "$package" || {
             print_error "Failed to install $package"
             return 1
         }
@@ -147,13 +156,11 @@ preflight_checks() {
         exit 1
     fi
 
-    # Check sudo access
-    if ! sudo -n true 2>/dev/null; then
-        print_warning "This script requires sudo access to install packages"
+    # Check if running as root or have sudo access
+    if [ "$EUID" -ne 0 ] && ! sudo -n true 2>/dev/null; then
+        print_warning "This script requires elevated privileges to install packages"
         print_info "You may be prompted for your password"
     fi
-
-    print_success "Sudo access verified"
 }
 
 # Install category: CLI Utilities
