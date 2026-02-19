@@ -1,28 +1,40 @@
-# Homebrew (macOS only)
+# PATH
 if [[ "$OSTYPE" == "darwin"* ]]; then
   export PATH="/opt/homebrew/bin:$PATH"
 fi
+export PATH="$HOME/.local/bin:$PATH"
+export PATH="$PATH:$HOME/.rvm/bin"
 
-# Antigen - plugin management
+# Shell
+if [ "$TMUX" = "" ]; then tmux; fi
+PROMPT='> '
+bindkey -v
+bindkey '^E' autosuggest-accept
+bindkey '^F' forward-word
+[[ "$PWD" == "$HOME" ]] && cd ~/ws
+
+# Plugins
 source ~/.config/antigen.zsh
-antigen use oh-my-zsh
-
-# Essential bundles
-antigen bundle git
-antigen bundle command-not-found
 antigen bundle agkozak/zsh-z
 antigen bundle zsh-users/zsh-syntax-highlighting
 antigen bundle zsh-users/zsh-autosuggestions
-
 antigen apply
 
-# Vim mode with history search
-bindkey -v
-bindkey ^R history-incremental-search-backward
-bindkey ^S history-incremental-search-forward
+# Secrets
+source ~/.config/secrets.zsh
 
-# Local binaries
-export PATH="$HOME/.local/bin:$PATH"
+# fzf
+eval "$(fzf --zsh)"
 
+# Tools
+eval "$(direnv hook zsh)"
+eval "$(mise activate zsh)"
 # Aliases
 alias nv="nvim"
+alias cl="claude"
+
+# Functions
+kctx() {
+  local ctx
+  ctx=$(kubectl config get-contexts -o name | fzf --height=10 --prompt="kube ctx> ") && kubectl config use-context "$ctx"
+}
