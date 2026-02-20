@@ -87,15 +87,31 @@ setup_lazyvim() {
     fi
 
     # Copy user's lazyvim config
-    if [ -d "$SCRIPT_DIR/config/nvim" ]; then
+    if [ -d "$SCRIPT_DIR/.config/nvim" ]; then
         print_info "Copying your LazyVim configuration..."
-        cp -r "$SCRIPT_DIR/config/nvim"/* "$HOME/.config/nvim/" || {
+        cp -r "$SCRIPT_DIR/.config/nvim"/* "$HOME/.config/nvim/" || {
             print_error "Failed to copy LazyVim config"
             return 1
         }
         print_success "LazyVim configuration copied"
     else
-        print_warning "No LazyVim config found in $SCRIPT_DIR/config/nvim"
+        print_warning "No LazyVim config found in $SCRIPT_DIR/.config/nvim"
+    fi
+}
+
+# Setup zshrc
+setup_zshrc() {
+    print_info "Setting up .zshrc..."
+
+    if [ -f "$SCRIPT_DIR/.zshrc" ]; then
+        cp "$SCRIPT_DIR/.zshrc" "$HOME/.zshrc" || {
+            print_error "Failed to copy .zshrc"
+            return 1
+        }
+        print_success ".zshrc copied to ~/.zshrc"
+    else
+        print_error "No .zshrc found in $SCRIPT_DIR"
+        return 1
     fi
 }
 
@@ -105,7 +121,7 @@ setup_tmux() {
 
     mkdir -p "$HOME/.config/tmux"
 
-    local tmux_conf_path="$SCRIPT_DIR/tmux.conf"
+    local tmux_conf_path="$SCRIPT_DIR/.config/tmux/tmux.conf"
 
     if [ -f "$tmux_conf_path" ]; then
         print_info "Copying tmux.conf..."
@@ -113,30 +129,34 @@ setup_tmux() {
             print_error "Failed to copy tmux.conf to ~/.config/tmux"
             return 1
         }
-        cp "$tmux_conf_path" "$HOME/.tmux.conf" || {
-            print_error "Failed to copy tmux.conf to home folder"
-            return 1
-        }
-        print_success "tmux.conf copied to ~/.config/tmux and ~/.tmux.conf"
+        print_success "tmux.conf copied to ~/.config/tmux/tmux.conf"
 
-        # Install tpm plugins if tpm is installed
-        if [ -f "$HOME/.tmux/plugins/tpm/bin/install_plugins" ]; then
+        # Clone tpm if not present
+        if [ ! -d "$HOME/.config/tmux/plugins/tpm" ]; then
+            print_info "Cloning tpm..."
+            git clone https://github.com/tmux-plugins/tpm "$HOME/.config/tmux/plugins/tpm" || {
+                print_warning "Failed to clone tpm"
+            }
+        fi
+
+        # Install tpm plugins
+        if [ -f "$HOME/.config/tmux/plugins/tpm/bin/install_plugins" ]; then
             print_info "Installing tmux plugins..."
-            "$HOME/.tmux/plugins/tpm/bin/install_plugins" || {
-                print_warning "Failed to install tmux plugins (this may be normal if tpm needs to be cloned first)"
+            "$HOME/.config/tmux/plugins/tpm/bin/install_plugins" || {
+                print_warning "Failed to install tmux plugins"
             }
         fi
 
         # Reload tmux config
         if command -v tmux &> /dev/null; then
             print_info "Reloading tmux config..."
-            tmux source-file "$HOME/.tmux.conf" 2>/dev/null || {
+            tmux source-file "$HOME/.config/tmux/tmux.conf" 2>/dev/null || {
                 print_warning "Could not reload tmux (no active tmux session, it will reload on next session start)"
             }
             print_success "Tmux config reloaded"
         fi
     else
-        print_error "No tmux.conf found in $SCRIPT_DIR"
+        print_error "No tmux.conf found in $SCRIPT_DIR/.config/tmux"
         return 1
     fi
 }
@@ -157,6 +177,9 @@ main() {
     if [ $failed -eq 0 ]; then
         setup_lazyvim || failed=$((failed + 1))
     fi
+
+    # Setup zshrc
+    setup_zshrc || failed=$((failed + 1))
 
     # Setup tmux config
     if [ $failed -eq 0 ]; then
