@@ -87,15 +87,15 @@ setup_lazyvim() {
     fi
 
     # Copy user's lazyvim config
-    if [ -d "$SCRIPT_DIR/.config/nvim" ]; then
+    if [ -d "$SCRIPT_DIR/config/nvim" ]; then
         print_info "Copying your LazyVim configuration..."
-        cp -r "$SCRIPT_DIR/.config/nvim"/* "$HOME/.config/nvim/" || {
+        cp -r "$SCRIPT_DIR/config/nvim"/* "$HOME/.config/nvim/" || {
             print_error "Failed to copy LazyVim config"
             return 1
         }
         print_success "LazyVim configuration copied"
     else
-        print_warning "No LazyVim config found in $SCRIPT_DIR/.config/nvim"
+        print_warning "No LazyVim config found in $SCRIPT_DIR/config/nvim"
     fi
 }
 
@@ -103,14 +103,14 @@ setup_lazyvim() {
 setup_zshrc() {
     print_info "Setting up .zshrc..."
 
-    if [ -f "$SCRIPT_DIR/.zshrc" ]; then
-        cp "$SCRIPT_DIR/.zshrc" "$HOME/.zshrc" || {
+    if [ -f "$SCRIPT_DIR/zshrc" ]; then
+        cp "$SCRIPT_DIR/zshrc" "$HOME/.zshrc" || {
             print_error "Failed to copy .zshrc"
             return 1
         }
         print_success ".zshrc copied to ~/.zshrc"
     else
-        print_error "No .zshrc found in $SCRIPT_DIR"
+        print_error "No zshrc found in $SCRIPT_DIR"
         return 1
     fi
 }
@@ -121,7 +121,7 @@ setup_tmux() {
 
     mkdir -p "$HOME/.config/tmux"
 
-    local tmux_conf_path="$SCRIPT_DIR/.config/tmux/tmux.conf"
+    local tmux_conf_path="$SCRIPT_DIR/config/tmux/tmux.conf"
 
     if [ -f "$tmux_conf_path" ]; then
         print_info "Copying tmux.conf..."
@@ -156,7 +156,7 @@ setup_tmux() {
             print_success "Tmux config reloaded"
         fi
     else
-        print_error "No tmux.conf found in $SCRIPT_DIR/.config/tmux"
+        print_error "No tmux.conf found in $SCRIPT_DIR/config/tmux"
         return 1
     fi
 }
