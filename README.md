@@ -14,5 +14,3 @@ The config (`alacritty.toml`) uses the [alacritty-theme](https://github.com/alac
 mkdir -p ~/.config/alacritty/themes
 git clone https://github.com/alacritty/alacritty-theme ~/.config/alacritty/themes
 ```
-
-Then symlink or copy `alacritty.toml` to `~/.config/alacritty/alacritty.toml`.
