@@ -24,3 +24,16 @@ Install TPM:
 ```sh
 git clone https://github.com/tmux-plugins/tpm ~/.config/tmux/plugins/tpm
 ```
+
+### macOS Installer
+
+Run the interactive macOS installer (assumes Homebrew is already installed):
+
+```sh
+./install-macos.sh
+```
+
+It prompts per tool and can install/configure `mise`, `zsh`, `tmux`, `neovim`, `lazyvim`, `fzf`, `direnv`, `gh` (GitHub CLI), `font-victor-mono-nerd-font`, `mactex-no-gui`, OpenAI Codex CLI, and Anthropic Claude CLI.
+For `alacritty`, it assumes the app is already installed and only manages config/themes.
+For tmux, it can install TPM and then install tmux plugins.
+For alacritty, it can install/update the `alacritty-theme` repo under `~/.config/alacritty/themes/alacritty-theme`.
