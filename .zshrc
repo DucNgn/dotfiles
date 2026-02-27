@@ -10,14 +10,27 @@ setopt SHARE_HISTORY
 setopt EXTENDED_HISTORY
 
 # PATH
-if [[ "$OSTYPE" == "darwin"* ]]; then
-  export PATH="/opt/homebrew/bin:$PATH"
+typeset -U path PATH
+if [[ "$OSTYPE" == darwin* ]]; then
+  path=(
+    /usr/local/bin
+    /usr/local/sbin
+    /opt/homebrew/bin
+    /opt/homebrew/sbin
+    $path
+  )
 fi
-export PATH="$HOME/.local/bin:$PATH"
-export PATH="$PATH:$HOME/.rvm/bin"
+path=(
+  "$HOME/.local/bin"
+  "$path[@]"
+  "$HOME/.rvm/bin"
+)
+export PATH
 
 # Shell
-if [ "$TMUX" = "" ]; then tmux; fi
+if [[ -z "$TMUX" ]] && command -v tmux >/dev/null 2>&1; then
+  tmux
+fi
 PROMPT='> '
 bindkey -v
 function zle-keymap-select {
@@ -44,11 +57,17 @@ antigen apply
 source ~/.config/secrets.zsh
 
 # fzf
-eval "$(fzf --zsh)"
+if command -v fzf >/dev/null 2>&1; then
+  eval "$(fzf --zsh)"
+fi
 
 # Tools
-eval "$(direnv hook zsh)"
-eval "$(mise activate zsh)"
+if command -v direnv >/dev/null 2>&1; then
+  eval "$(direnv hook zsh)"
+fi
+if command -v mise >/dev/null 2>&1; then
+  eval "$(mise activate zsh)"
+fi
 # Editor
 export EDITOR="nvim"
 export VISUAL="nvim"
