@@ -1,5 +1,5 @@
 [general]
-import = ["~/.config/alacritty/themes/themes/carbonfox.yaml"]
+import = ["~/.config/alacritty/themes/themes/carbonfox.toml"]
 
 [window]
 decorations = "buttonless"
@@ -13,5 +13,5 @@ size = 20.0
 [font.normal]
 family = "VictorMono Nerd Font"
 
-[shell]
-program = "/bin/zsh"
+[terminal]
+shell = "/bin/zsh"
