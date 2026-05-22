@@ -1,0 +1,83 @@
+{
+  "$schema": "https://raw.githubusercontent.com/badlogic/pi-mono/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json",
+  "name": "washi-dark",
+  "vars": {
+    "shiro": "#e8e4df",
+    "kinu": "#c8c3ba",
+    "nezumi": "#908a82",
+    "hai": "#605a52",
+    "sumi": "#3a3632",
+    "kuro": "#2a2724",
+    "yami": "#1e1c1a",
+    "red": "#c07068",
+    "green": "#8a9e78",
+    "yellow": "#b87a60",
+    "blue": "#7a8fa0",
+    "magenta": "#9a7a8a",
+    "cyan": "#7a9a92"
+  },
+  "colors": {
+    "accent": "nezumi",
+    "border": "sumi",
+    "borderAccent": "hai",
+    "borderMuted": "sumi",
+    "success": "green",
+    "error": "red",
+    "warning": "yellow",
+    "muted": "hai",
+    "dim": "sumi",
+    "text": "shiro",
+    "thinkingText": "hai",
+
+    "selectedBg": "#332f2c",
+    "userMessageBg": "#332f2c",
+    "userMessageText": "shiro",
+    "customMessageBg": "#332f2c",
+    "customMessageText": "shiro",
+    "customMessageLabel": "nezumi",
+    "toolPendingBg": "kuro",
+    "toolSuccessBg": "#242820",
+    "toolErrorBg": "#282220",
+    "toolTitle": "shiro",
+    "toolOutput": "kinu",
+
+    "mdHeading": "shiro",
+    "mdLink": "blue",
+    "mdLinkUrl": "hai",
+    "mdCode": "kinu",
+    "mdCodeBlock": "kinu",
+    "mdCodeBlockBorder": "sumi",
+    "mdQuote": "hai",
+    "mdQuoteBorder": "sumi",
+    "mdHr": "sumi",
+    "mdListBullet": "nezumi",
+
+    "toolDiffAdded": "green",
+    "toolDiffRemoved": "red",
+    "toolDiffContext": "hai",
+
+    "syntaxComment": "hai",
+    "syntaxKeyword": "blue",
+    "syntaxFunction": "shiro",
+    "syntaxVariable": "kinu",
+    "syntaxString": "green",
+    "syntaxNumber": "magenta",
+    "syntaxType": "cyan",
+    "syntaxOperator": "nezumi",
+    "syntaxPunctuation": "hai",
+
+    "thinkingOff": "sumi",
+    "thinkingMinimal": "hai",
+    "thinkingLow": "nezumi",
+    "thinkingMedium": "blue",
+    "thinkingHigh": "magenta",
+    "thinkingXhigh": "red",
+
+    "bashMode": "yellow"
+  },
+  "export": {
+    "pageBg": "yami",
+    "cardBg": "kuro",
+    "infoBg": "#2e2a24"
+  }
+}

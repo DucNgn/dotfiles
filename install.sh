@@ -99,6 +99,58 @@ setup_lazyvim() {
     fi
 }
 
+# Setup alacritty config
+setup_alacritty() {
+    print_info "Setting up Alacritty configuration..."
+
+    mkdir -p "$HOME/.config/alacritty/themes"
+
+    if [ -d "$SCRIPT_DIR/config/alacritty" ]; then
+        cp "$SCRIPT_DIR/config/alacritty/alacritty.toml" "$HOME/.config/alacritty/alacritty.toml" || {
+            print_error "Failed to copy alacritty.toml"
+            return 1
+        }
+        cp "$SCRIPT_DIR/config/alacritty/themes/"*.toml "$HOME/.config/alacritty/themes/" 2>/dev/null || true
+        print_success "Alacritty configuration copied"
+    else
+        print_warning "No Alacritty config found in $SCRIPT_DIR/config/alacritty"
+    fi
+}
+
+# Setup pi themes
+setup_pi_themes() {
+    print_info "Setting up pi themes..."
+
+    mkdir -p "$HOME/.pi/agent/themes"
+
+    if [ -d "$SCRIPT_DIR/config/pi/themes" ]; then
+        for f in "$SCRIPT_DIR/config/pi/themes/"*.json; do
+            local name=$(basename "$f")
+            local target="$HOME/.pi/agent/themes/$name"
+            rm -f "$target"
+            ln -s "$f" "$target"
+            print_success "Linked pi theme: $name"
+        done
+    else
+        print_warning "No pi themes found in $SCRIPT_DIR/config/pi/themes"
+    fi
+}
+
+# Setup theme-toggle
+setup_theme_toggle() {
+    print_info "Setting up theme-toggle..."
+
+    local src="$SCRIPT_DIR/bin/theme-toggle"
+    if [ -f "$src" ]; then
+        mkdir -p "$HOME/.local/bin"
+        cp "$src" "$HOME/.local/bin/theme-toggle"
+        chmod +x "$HOME/.local/bin/theme-toggle"
+        print_success "theme-toggle installed to ~/.local/bin/theme-toggle"
+    else
+        print_warning "No theme-toggle found in $SCRIPT_DIR/bin"
+    fi
+}
+
 # Setup zshrc
 setup_zshrc() {
     print_info "Setting up .zshrc..."
@@ -177,6 +229,15 @@ main() {
     if [ $failed -eq 0 ]; then
         setup_lazyvim || failed=$((failed + 1))
     fi
+
+    # Setup alacritty
+    setup_alacritty || failed=$((failed + 1))
+
+    # Setup pi themes
+    setup_pi_themes || failed=$((failed + 1))
+
+    # Setup theme-toggle
+    setup_theme_toggle || failed=$((failed + 1))
 
     # Setup zshrc
     setup_zshrc || failed=$((failed + 1))
