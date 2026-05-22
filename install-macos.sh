@@ -262,7 +262,7 @@ install_tmux_plugins_with_tpm() {
 install_and_configure_tmux() {
   install_formula_if_needed "tmux"
   check_and_offer_config_sync "tmux" \
-    "$SCRIPT_DIR/.config/tmux/tmux.conf" \
+    "$SCRIPT_DIR/config/tmux/tmux.conf" \
     "$HOME/.config/tmux/tmux.conf"
   configure_tmux_entrypoint
   configure_tpm
@@ -290,11 +290,33 @@ configure_alacritty_themes_repo() {
   fi
 }
 
+install_and_configure_theme_toggle() {
+  local src="$SCRIPT_DIR/bin/theme-toggle"
+  local dst="$HOME/.local/bin/theme-toggle"
+
+  if [ ! -f "$src" ]; then
+    warn "theme-toggle not found in dotfiles repo."
+    return 0
+  fi
+
+  mkdir -p "$HOME/.local/bin"
+  check_and_offer_config_sync "theme-toggle" "$src" "$dst"
+  if [ -e "$dst" ]; then
+    chmod +x "$dst"
+    ok "theme-toggle is executable."
+  fi
+}
+
 install_and_configure_alacritty() {
   ok "Assuming alacritty is already installed."
   check_and_offer_config_sync "alacritty" \
-    "$SCRIPT_DIR/.config/alacritty/alacritty.toml" \
+    "$SCRIPT_DIR/config/alacritty/alacritty.toml" \
     "$HOME/.config/alacritty/alacritty.toml"
+  # Custom washi theme (separate from cloned alacritty-theme repo)
+  mkdir -p "$HOME/.config/alacritty/themes"
+  check_and_offer_config_sync "washi theme" \
+    "$SCRIPT_DIR/config/alacritty/themes/washi.toml" \
+    "$HOME/.config/alacritty/themes/washi.toml"
   configure_alacritty_themes_repo
 }
 
@@ -329,7 +351,7 @@ install_and_configure_lazyvim() {
   fi
 
   check_and_offer_config_sync "neovim" \
-    "$SCRIPT_DIR/.config/nvim/init.lua" \
+    "$SCRIPT_DIR/config/nvim/init.lua" \
     "$HOME/.config/nvim/init.lua"
 }
 
@@ -358,10 +380,15 @@ install_and_configure_mactex_no_gui() {
   warn "No dedicated MacTeX config file in this repo to compare."
 }
 
+install_and_configure_skim() {
+  install_cask_if_needed "skim"
+  warn "No dedicated Skim config file in this repo to compare."
+}
+
 install_and_configure_codex_cli() {
   install_npm_global_if_needed "codex" "@openai/codex"
   check_and_offer_config_sync "codex" \
-    "$SCRIPT_DIR/.codex/config.toml" \
+    "$SCRIPT_DIR/config/codex/config.toml" \
     "$HOME/.codex/config.toml"
 }
 
@@ -379,7 +406,7 @@ install_and_configure_zsh() {
     install_formula_if_needed "zsh"
   fi
   check_and_offer_config_sync "zsh" \
-    "$SCRIPT_DIR/.zshrc" \
+    "$SCRIPT_DIR/zshrc" \
     "$HOME/.zshrc"
 }
 
@@ -422,6 +449,7 @@ main() {
   run_section "mise" install_and_configure_mise
   run_section "zsh" install_and_configure_zsh
   run_section "tmux" install_and_configure_tmux
+  run_section "theme-toggle" install_and_configure_theme_toggle
   run_section "alacritty" install_and_configure_alacritty
   run_section "neovim" install_and_configure_neovim
   run_section "lazyvim" install_and_configure_lazyvim
@@ -430,6 +458,7 @@ main() {
   run_section "GitHub CLI" install_and_configure_github_cli
   run_section "Victor Mono Nerd Font" install_and_configure_victor_nerd_font
   run_section "MacTeX (No GUI)" install_and_configure_mactex_no_gui
+  run_section "Skim (PDF viewer)" install_and_configure_skim
   run_section "OpenAI Codex CLI" install_and_configure_codex_cli
   run_section "Anthropic Claude CLI" install_and_configure_claude_cli
 

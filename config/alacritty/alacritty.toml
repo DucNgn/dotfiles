@@ -1,9 +1,9 @@
 [general]
-import = ["~/.config/alacritty/themes/themes/carbonfox.toml"]
+import = ["~/.config/alacritty/themes/themes/kanagawa_dragon.toml"]
 
 [window]
-decorations = "buttonless"
-opacity = 0.95
+decorations = "full"
+opacity = 1.0
 option_as_alt = "Both"
 padding = { x = 8, y = 8 }
 
