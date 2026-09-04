@@ -136,6 +136,32 @@ setup_pi_themes() {
     fi
 }
 
+# Setup herdr config
+setup_herdr() {
+    print_info "Setting up herdr configuration..."
+
+    if ! command -v herdr &> /dev/null; then
+        print_warning "herdr is not installed, skipping config (see https://herdr.dev for install)"
+        return 0
+    fi
+
+    mkdir -p "$HOME/.config/herdr"
+
+    local src="$SCRIPT_DIR/config/herdr/config.toml"
+    local target="$HOME/.config/herdr/config.toml"
+
+    if [ -f "$src" ]; then
+        rm -f "$target"
+        ln -s "$src" "$target"
+        print_success "Linked herdr config: config.toml"
+
+        # Reload running server if present
+        herdr server reload-config &> /dev/null || true
+    else
+        print_warning "No herdr config found in $SCRIPT_DIR/config/herdr"
+    fi
+}
+
 # Setup theme-toggle
 setup_theme_toggle() {
     print_info "Setting up theme-toggle..."
@@ -235,6 +261,9 @@ main() {
 
     # Setup pi themes
     setup_pi_themes || failed=$((failed + 1))
+
+    # Setup herdr config
+    setup_herdr || failed=$((failed + 1))
 
     # Setup theme-toggle
     setup_theme_toggle || failed=$((failed + 1))

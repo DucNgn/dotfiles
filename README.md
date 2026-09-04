@@ -3,6 +3,7 @@
 + Lazyvim / Vim
 + Tmux
 + Alacritty
++ Herdr
 
 ## Setup
 
@@ -14,6 +15,10 @@ The config (`alacritty.toml`) uses the [alacritty-theme](https://github.com/alac
 mkdir -p ~/.config/alacritty/themes
 git clone https://github.com/alacritty/alacritty-theme ~/.config/alacritty/themes
 ```
+
+### Herdr
+
+The herdr config (`config.toml`) is symlinked to `~/.config/herdr/config.toml` by `install.sh`, so local edits stay in sync with the repo automatically. Assumes `herdr` is already installed; run `herdr server reload-config` after editing to apply changes.
 
 ### Tmux
 
