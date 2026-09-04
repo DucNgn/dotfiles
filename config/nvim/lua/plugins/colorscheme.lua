@@ -1,42 +1,36 @@
-local function current_mode()
-  local f = io.open(os.getenv("HOME") .. "/.config/theme-mode", "r")
-  if not f then
-    return "dark"
+local THEME_MODE_FILE = vim.fn.expand("~/.local/state/theme-mode")
+
+local function current_theme_mode()
+  local mode_file = io.open(THEME_MODE_FILE, "r")
+  if not mode_file then
+    return "light"
   end
-  local mode = f:read("*l"):gsub("%s+", "")
-  f:close()
-  return mode
+
+  local mode = mode_file:read("*l")
+  mode_file:close()
+  return mode == "dark" and "dark" or "light"
 end
+
+local theme_mode = current_theme_mode()
 
 return {
   {
-    "rebelot/kanagawa.nvim",
+    "folke/tokyonight.nvim",
     lazy = false,
     priority = 1000,
+    opts = {
+      style = theme_mode == "dark" and "night" or "day",
+      styles = {
+        comments = { italic = false },
+      },
+    },
   },
 
   {
     "LazyVim/LazyVim",
     opts = function(_, opts)
-      local mode = current_mode()
-      opts.colorscheme = mode == "light" and "washi" or "kanagawa-dragon"
-      vim.o.background = mode == "light" and "light" or "dark"
-    end,
-  },
-  -- Auto-reload theme when theme-mode file changes
-  {
-    "rktjmp/fwatch.nvim",
-    config = function()
-      require("fwatch").watch(os.getenv("HOME") .. "/.config/theme-mode", {
-        on_event = function()
-          vim.schedule(function()
-            local m = current_mode()
-            vim.o.background = m == "light" and "light" or "dark"
-            local s = m == "light" and "washi" or "kanagawa-dragon"
-            vim.cmd("colorscheme " .. s)
-          end)
-        end,
-      })
+      opts.colorscheme = "tokyonight-" .. (theme_mode == "dark" and "night" or "day")
+      vim.o.background = theme_mode
     end,
   },
 }

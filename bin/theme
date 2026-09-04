@@ -1,0 +1,191 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+THEME_ASSET_ROOT="${THEME_ASSET_ROOT:-$HOME/.config/theme}"
+THEME_MODE_FILE="${THEME_MODE_FILE:-$HOME/.local/state/theme-mode}"
+PI_THEME_FILE="$HOME/.pi/agent/themes/tokyonight.json"
+CLAUDE_THEME_FILE="$HOME/.claude/themes/tokyonight.json"
+
+usage() {
+  echo "Usage: theme [light|dark|toggle|status]"
+}
+
+system_theme_mode() {
+  if [ "$(uname -s)" = "Darwin" ] && defaults read -g AppleInterfaceStyle >/dev/null 2>&1; then
+    echo "dark"
+  else
+    echo "light"
+  fi
+}
+
+current_theme_mode() {
+  if [ -f "$THEME_MODE_FILE" ]; then
+    local mode
+    mode="$(tr -d '[:space:]' < "$THEME_MODE_FILE")"
+    if [ "$mode" = "light" ] || [ "$mode" = "dark" ]; then
+      echo "$mode"
+      return
+    fi
+  fi
+
+  system_theme_mode
+}
+
+set_macos_appearance() {
+  local mode="$1"
+  if [ "$(uname -s)" != "Darwin" ]; then
+    return
+  fi
+
+  local dark_mode=false
+  if [ "$mode" = "dark" ]; then
+    dark_mode=true
+  fi
+
+  osascript -e "tell application \"System Events\" to tell appearance preferences to set dark mode to $dark_mode" >/dev/null
+}
+
+render_json_theme() {
+  local source_file="$1"
+  local target_file="$2"
+  local theme_name="$3"
+
+  python3 - "$source_file" "$target_file" "$theme_name" <<'PY'
+import json
+import os
+from pathlib import Path
+import sys
+import tempfile
+
+source = Path(sys.argv[1])
+target = Path(sys.argv[2])
+theme_name = sys.argv[3]
+
+data = json.loads(source.read_text())
+data["name"] = theme_name
+target.parent.mkdir(parents=True, exist_ok=True)
+
+with tempfile.NamedTemporaryFile("w", dir=target.parent, delete=False) as output:
+    json.dump(data, output, indent=2)
+    output.write("\n")
+    temporary_path = output.name
+
+os.replace(temporary_path, target)
+PY
+}
+
+select_active_themes() {
+  python3 - "$HOME/.pi/agent/settings.json" "$HOME/.claude/settings.json" <<'PY'
+import json
+import os
+from pathlib import Path
+import sys
+import tempfile
+
+for path_value, theme in ((sys.argv[1], "tokyonight"), (sys.argv[2], "custom:tokyonight")):
+    path = Path(path_value)
+    data = json.loads(path.read_text()) if path.exists() else {}
+    if data.get("theme") == theme:
+        continue
+
+    data["theme"] = theme
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile("w", dir=path.parent, delete=False) as output:
+        json.dump(data, output, indent=2)
+        output.write("\n")
+        temporary_path = output.name
+    os.replace(temporary_path, path)
+PY
+}
+
+reload_tmux_theme() {
+  local mode="$1"
+  if tmux list-sessions >/dev/null 2>&1; then
+    tmux source-file "$THEME_ASSET_ROOT/tmux/$mode.conf"
+  fi
+}
+
+reload_neovim_theme() {
+  local mode="$1"
+  local colorscheme="tokyonight-day"
+  if [ "$mode" = "dark" ]; then
+    colorscheme="tokyonight-night"
+  fi
+
+  local socket
+  while IFS= read -r socket; do
+    [ -S "$socket" ] || continue
+    if nvim --server "$socket" --remote-expr '1' >/dev/null 2>&1; then
+      nvim --server "$socket" --remote-send "<Cmd>set background=$mode<CR><Cmd>colorscheme $colorscheme<CR>" >/dev/null 2>&1 || true
+    fi
+  done < <(lsof -a -c nvim -U -Fn 2>/dev/null | sed -n 's/^n//p' | sort -u)
+}
+
+reload_herdr_config() {
+  if pgrep -x herdr >/dev/null 2>&1; then
+    herdr server reload-config >/dev/null 2>&1 || true
+  fi
+}
+
+print_post_switch_instructions() {
+  cat <<'EOF'
+Normally no manual reload is needed.
+If an app did not update:
+  Ghostty: press Cmd+Shift+, (or restart Ghostty once).
+  Pi/Claude: restart sessions created before the shared theme was installed once.
+EOF
+}
+
+apply_theme() {
+  local mode="$1"
+
+  for required_file in \
+    "$THEME_ASSET_ROOT/tmux/$mode.conf" \
+    "$THEME_ASSET_ROOT/pi/$mode.json" \
+    "$THEME_ASSET_ROOT/claude/$mode.json"; do
+    if [ ! -f "$required_file" ]; then
+      echo "Missing theme asset: $required_file" >&2
+      exit 1
+    fi
+  done
+
+  mkdir -p "$(dirname "$THEME_MODE_FILE")"
+  printf '%s\n' "$mode" > "$THEME_MODE_FILE"
+
+  render_json_theme "$THEME_ASSET_ROOT/pi/$mode.json" "$PI_THEME_FILE" "tokyonight"
+  render_json_theme "$THEME_ASSET_ROOT/claude/$mode.json" "$CLAUDE_THEME_FILE" "Tokyo Night"
+  select_active_themes
+
+  set_macos_appearance "$mode"
+  reload_tmux_theme "$mode"
+  reload_neovim_theme "$mode"
+  reload_herdr_config
+
+  echo "Tokyo Night $mode mode enabled."
+  print_post_switch_instructions
+}
+
+command="${1:-toggle}"
+case "$command" in
+  light|dark)
+    apply_theme "$command"
+    ;;
+  toggle)
+    if [ "$(current_theme_mode)" = "dark" ]; then
+      apply_theme "light"
+    else
+      apply_theme "dark"
+    fi
+    ;;
+  status)
+    current_theme_mode
+    ;;
+  -h|--help|help)
+    usage
+    ;;
+  *)
+    usage >&2
+    exit 2
+    ;;
+esac

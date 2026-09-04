@@ -1,5 +1,5 @@
 [general]
-import = ["~/.config/alacritty/themes/washi.toml"]
+import = ["~/.config/alacritty/themes/themes/kanagawa_dragon.toml"]
 
 [window]
 decorations = "full"

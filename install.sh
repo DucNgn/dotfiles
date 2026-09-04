@@ -99,41 +99,58 @@ setup_lazyvim() {
     fi
 }
 
-# Setup alacritty config
-setup_alacritty() {
-    print_info "Setting up Alacritty configuration..."
+# Setup Ghostty config
+setup_ghostty() {
+    print_info "Setting up Ghostty configuration..."
 
-    mkdir -p "$HOME/.config/alacritty/themes"
+    local src="$SCRIPT_DIR/config/ghostty/config"
+    local target="$HOME/.config/ghostty/config"
 
-    if [ -d "$SCRIPT_DIR/config/alacritty" ]; then
-        cp "$SCRIPT_DIR/config/alacritty/alacritty.toml" "$HOME/.config/alacritty/alacritty.toml" || {
-            print_error "Failed to copy alacritty.toml"
-            return 1
-        }
-        cp "$SCRIPT_DIR/config/alacritty/themes/"*.toml "$HOME/.config/alacritty/themes/" 2>/dev/null || true
-        print_success "Alacritty configuration copied"
+    if [ -f "$src" ]; then
+        mkdir -p "$HOME/.config/ghostty"
+        rm -f "$target"
+        ln -s "$src" "$target"
+        print_success "Linked Ghostty configuration"
     else
-        print_warning "No Alacritty config found in $SCRIPT_DIR/config/alacritty"
+        print_warning "No Ghostty config found in $SCRIPT_DIR/config/ghostty"
     fi
 }
 
-# Setup pi themes
-setup_pi_themes() {
-    print_info "Setting up pi themes..."
+# Setup the shared Tokyo Night theme command and assets
+setup_theme_system() {
+    print_info "Setting up Tokyo Night theme system..."
 
-    mkdir -p "$HOME/.pi/agent/themes"
+    local command_src="$SCRIPT_DIR/bin/theme"
+    local command_target="$HOME/.local/bin/theme"
+    local assets_src="$SCRIPT_DIR/config/theme"
+    local assets_target="$HOME/.config/theme"
 
-    if [ -d "$SCRIPT_DIR/config/pi/themes" ]; then
-        for f in "$SCRIPT_DIR/config/pi/themes/"*.json; do
-            local name=$(basename "$f")
-            local target="$HOME/.pi/agent/themes/$name"
-            rm -f "$target"
-            ln -s "$f" "$target"
-            print_success "Linked pi theme: $name"
-        done
-    else
-        print_warning "No pi themes found in $SCRIPT_DIR/config/pi/themes"
+    if [ ! -f "$command_src" ] || [ ! -d "$assets_src" ]; then
+        print_warning "Theme command or assets are missing from the dotfiles repo"
+        return 0
     fi
+
+    mkdir -p "$HOME/.local/bin" "$HOME/.config"
+    rm -f "$command_target"
+    ln -s "$command_src" "$command_target"
+
+    if [ -e "$assets_target" ] && [ ! -L "$assets_target" ]; then
+        local backup
+        backup="${assets_target}.bak.$(date +%Y%m%d%H%M%S)"
+        mv "$assets_target" "$backup"
+        print_warning "Backed up existing theme assets to $backup"
+    else
+        rm -f "$assets_target"
+    fi
+    ln -s "$assets_src" "$assets_target"
+
+    local mode
+    mode="$(cat "$HOME/.local/state/theme-mode" 2>/dev/null || echo light)"
+    if [ "$mode" != "light" ] && [ "$mode" != "dark" ]; then
+        mode="light"
+    fi
+    "$command_target" "$mode"
+    print_success "Linked theme command and applied $mode mode"
 }
 
 # Setup herdr config
@@ -162,20 +179,7 @@ setup_herdr() {
     fi
 }
 
-# Setup theme-toggle
-setup_theme_toggle() {
-    print_info "Setting up theme-toggle..."
 
-    local src="$SCRIPT_DIR/bin/theme-toggle"
-    if [ -f "$src" ]; then
-        mkdir -p "$HOME/.local/bin"
-        cp "$src" "$HOME/.local/bin/theme-toggle"
-        chmod +x "$HOME/.local/bin/theme-toggle"
-        print_success "theme-toggle installed to ~/.local/bin/theme-toggle"
-    else
-        print_warning "No theme-toggle found in $SCRIPT_DIR/bin"
-    fi
-}
 
 # Setup zshrc
 setup_zshrc() {
@@ -256,17 +260,16 @@ main() {
         setup_lazyvim || failed=$((failed + 1))
     fi
 
-    # Setup alacritty
-    setup_alacritty || failed=$((failed + 1))
+    # Setup Ghostty
+    setup_ghostty || failed=$((failed + 1))
 
-    # Setup pi themes
-    setup_pi_themes || failed=$((failed + 1))
+    # Setup shared themes
+    setup_theme_system || failed=$((failed + 1))
 
     # Setup herdr config
     setup_herdr || failed=$((failed + 1))
 
-    # Setup theme-toggle
-    setup_theme_toggle || failed=$((failed + 1))
+
 
     # Setup zshrc
     setup_zshrc || failed=$((failed + 1))

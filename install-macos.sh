@@ -269,55 +269,12 @@ install_and_configure_tmux() {
   install_tmux_plugins_with_tpm
 }
 
-configure_alacritty_themes_repo() {
-  local themes_dir="$HOME/.config/alacritty/themes"
-  local themes_repo="$themes_dir/alacritty-theme"
 
-  mkdir -p "$themes_dir"
-  if [ -d "$themes_repo/.git" ]; then
-    ok "alacritty-theme repo already exists at $themes_repo"
-    if prompt_yes_no "Update alacritty-theme repo now?"; then
-      info "Updating alacritty-theme repository..."
-      git -C "$themes_repo" pull --ff-only
-      ok "alacritty-theme updated."
-    fi
-  else
-    if prompt_yes_no "alacritty-theme repo is missing. Install it now?"; then
-      info "Cloning alacritty-theme repository..."
-      git clone https://github.com/alacritty/alacritty-theme "$themes_repo"
-      ok "alacritty-theme installed."
-    fi
-  fi
-}
-
-install_and_configure_theme_toggle() {
-  local src="$SCRIPT_DIR/bin/theme-toggle"
-  local dst="$HOME/.local/bin/theme-toggle"
-
-  if [ ! -f "$src" ]; then
-    warn "theme-toggle not found in dotfiles repo."
-    return 0
-  fi
-
-  mkdir -p "$HOME/.local/bin"
-  check_and_offer_config_sync "theme-toggle" "$src" "$dst"
-  if [ -e "$dst" ]; then
-    chmod +x "$dst"
-    ok "theme-toggle is executable."
-  fi
-}
-
-install_and_configure_alacritty() {
-  ok "Assuming alacritty is already installed."
-  check_and_offer_config_sync "alacritty" \
-    "$SCRIPT_DIR/config/alacritty/alacritty.toml" \
-    "$HOME/.config/alacritty/alacritty.toml"
-  # Custom washi theme (separate from cloned alacritty-theme repo)
-  mkdir -p "$HOME/.config/alacritty/themes"
-  check_and_offer_config_sync "washi theme" \
-    "$SCRIPT_DIR/config/alacritty/themes/washi.toml" \
-    "$HOME/.config/alacritty/themes/washi.toml"
-  configure_alacritty_themes_repo
+install_and_configure_ghostty() {
+  install_cask_if_needed "ghostty"
+  check_and_offer_config_sync "ghostty" \
+    "$SCRIPT_DIR/config/ghostty/config" \
+    "$HOME/.config/ghostty/config"
 }
 
 install_and_configure_neovim() {
@@ -392,11 +349,26 @@ install_and_configure_codex_cli() {
     "$HOME/.codex/config.toml"
 }
 
+install_and_configure_theme_system() {
+  check_and_offer_config_sync "theme command" \
+    "$SCRIPT_DIR/bin/theme" \
+    "$HOME/.local/bin/theme"
+  check_and_offer_config_sync "theme assets" \
+    "$SCRIPT_DIR/config/theme" \
+    "$HOME/.config/theme"
+
+  if [ -x "$HOME/.local/bin/theme" ] && [ -d "$HOME/.config/theme" ]; then
+    local mode
+    mode="$(cat "$HOME/.local/state/theme-mode" 2>/dev/null || echo light)"
+    if [ "$mode" != "light" ] && [ "$mode" != "dark" ]; then
+      mode="light"
+    fi
+    "$HOME/.local/bin/theme" "$mode"
+  fi
+}
+
 install_and_configure_claude_cli() {
   install_npm_global_if_needed "claude" "@anthropic-ai/claude-code"
-  check_and_offer_config_sync "claude" \
-    "$SCRIPT_DIR/.claude/settings.json" \
-    "$HOME/.claude/settings.json"
 }
 
 install_and_configure_zsh() {
@@ -449,8 +421,8 @@ main() {
   run_section "mise" install_and_configure_mise
   run_section "zsh" install_and_configure_zsh
   run_section "tmux" install_and_configure_tmux
-  run_section "theme-toggle" install_and_configure_theme_toggle
-  run_section "alacritty" install_and_configure_alacritty
+
+  run_section "Ghostty" install_and_configure_ghostty
   run_section "neovim" install_and_configure_neovim
   run_section "lazyvim" install_and_configure_lazyvim
   run_section "fzf" install_and_configure_fzf
@@ -461,6 +433,7 @@ main() {
   run_section "Skim (PDF viewer)" install_and_configure_skim
   run_section "OpenAI Codex CLI" install_and_configure_codex_cli
   run_section "Anthropic Claude CLI" install_and_configure_claude_cli
+  run_section "Tokyo Night themes" install_and_configure_theme_system
 
   section "Completed"
   ok "Installer finished."

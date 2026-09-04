@@ -1,0 +1,8 @@
+theme = light:TokyoNight Day,dark:TokyoNight Night
+font-family = VictorMono Nerd Font
+font-size = 20
+
+window-padding-x = 8
+window-padding-y = 8
+
+macos-option-as-alt = true
